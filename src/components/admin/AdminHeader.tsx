@@ -21,12 +21,15 @@ export function AdminHeader({ onCommandOpen }: AdminHeaderProps) {
   const { toast } = useToast();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    // Clear admin session
+    localStorage.removeItem("admin_logged_in");
+    localStorage.removeItem("admin_username");
+    
     toast({
       title: "Logget ut",
       description: "Du har blitt logget ut av admin-panelet.",
     });
-    navigate("/");
+    navigate("/login");
   };
 
   return (

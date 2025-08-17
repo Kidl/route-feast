@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Menu, X } from "lucide-react";
+import { MapPin, Menu, X, Settings } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,6 +43,12 @@ export const Header = () => {
             <Button variant="default" size="sm">
               Book nå
             </Button>
+            <Link to="/login">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Settings className="h-4 w-4" />
+                Admin
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -75,6 +82,12 @@ export const Header = () => {
                 <Button variant="default" size="sm">
                   Book nå
                 </Button>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm" className="justify-start gap-2">
+                    <Settings className="h-4 w-4" />
+                    Admin
+                  </Button>
+                </Link>
               </div>
             </nav>
           </div>
