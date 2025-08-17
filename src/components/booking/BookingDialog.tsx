@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Circle, ArrowLeft, ArrowRight } from "lucide-react";
-import { AuthDialog } from "./AuthDialog";
+
 import { DateTimePicker } from "./DateTimePicker";
 import { ParticipantForm } from "./ParticipantForm";
 import { PaymentStep } from "./PaymentStep";
@@ -17,11 +17,11 @@ interface BookingDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type BookingStep = 'auth' | 'datetime' | 'participants' | 'payment' | 'confirmation';
+type BookingStep = 'datetime' | 'participants' | 'payment' | 'confirmation';
 
 interface BookingData {
-  userType: 'guest' | 'registered';
-  userData: any;
+  userType?: 'guest' | 'registered';
+  userData?: any;
   selectedDate: Date | null;
   selectedTimeSlot: any;
   participantInfo: any;
@@ -29,7 +29,6 @@ interface BookingData {
 }
 
 const STEPS: { key: BookingStep; label: string; description: string }[] = [
-  { key: 'auth', label: 'Start', description: 'Login or continue as guest' },
   { key: 'datetime', label: 'Date & Time', description: 'Choose your preferred slot' },
   { key: 'participants', label: 'Details', description: 'Participants and preferences' },
   { key: 'payment', label: 'Payment', description: 'Secure checkout' },
@@ -37,10 +36,8 @@ const STEPS: { key: BookingStep; label: string; description: string }[] = [
 ];
 
 export const BookingDialog = ({ route, open, onOpenChange }: BookingDialogProps) => {
-  const [currentStep, setCurrentStep] = useState<BookingStep>('auth');
+  const [currentStep, setCurrentStep] = useState<BookingStep>('datetime');
   const [bookingData, setBookingData] = useState<BookingData>({
-    userType: 'guest',
-    userData: null,
     selectedDate: null,
     selectedTimeSlot: null,
     participantInfo: null,
@@ -52,8 +49,6 @@ export const BookingDialog = ({ route, open, onOpenChange }: BookingDialogProps)
 
   const canProceed = () => {
     switch (currentStep) {
-      case 'auth':
-        return bookingData.userData !== null;
       case 'datetime':
         return bookingData.selectedDate && bookingData.selectedTimeSlot;
       case 'participants':
@@ -84,10 +79,8 @@ export const BookingDialog = ({ route, open, onOpenChange }: BookingDialogProps)
   };
 
   const resetBooking = () => {
-    setCurrentStep('auth');
+    setCurrentStep('datetime');
     setBookingData({
-      userType: 'guest',
-      userData: null,
       selectedDate: null,
       selectedTimeSlot: null,
       participantInfo: null,
@@ -168,8 +161,12 @@ export const BookingDialog = ({ route, open, onOpenChange }: BookingDialogProps)
               <PaymentStep
                 route={route}
                 bookingData={bookingData}
-                onPaymentComplete={(paymentData) => {
-                  updateBookingData({ paymentData });
+                onPaymentComplete={(paymentData, userType, userData) => {
+                  updateBookingData({ 
+                    paymentData, 
+                    userType, 
+                    userData 
+                  });
                   setCurrentStep('confirmation');
                 }}
               />
@@ -216,19 +213,6 @@ export const BookingDialog = ({ route, open, onOpenChange }: BookingDialogProps)
         </DialogContent>
       </Dialog>
 
-      {/* Auth Dialog */}
-      <AuthDialog
-        open={currentStep === 'auth'}
-        onOpenChange={(authOpen) => {
-          if (!authOpen && currentStep === 'auth') {
-            handleClose();
-          }
-        }}
-        onSuccess={(userType, userData) => {
-          updateBookingData({ userType, userData });
-          setCurrentStep('datetime');
-        }}
-      />
     </>
   );
 };
