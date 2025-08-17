@@ -1,7 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Users, Star } from "lucide-react";
+import { MapPin, Clock, Users, Star, Award } from "lucide-react";
+
+interface Restaurant {
+  name: string;
+  cuisine: string;
+  description: string;
+  specialties?: string[];
+  michelinMentioned?: boolean;
+}
 
 interface RouteCardProps {
   id: string;
@@ -13,8 +21,9 @@ interface RouteCardProps {
   maxCapacity: number;
   currentBookings: number;
   rating: number;
-  restaurants: string[];
+  restaurants: Restaurant[];
   location: string;
+  highlights?: string[];
 }
 
 export const RouteCard = ({
@@ -28,6 +37,7 @@ export const RouteCard = ({
   rating,
   restaurants,
   location,
+  highlights,
 }: RouteCardProps) => {
   const availableSpots = maxCapacity - currentBookings;
   const isAlmostFull = availableSpots <= 3;
@@ -84,20 +94,45 @@ export const RouteCard = ({
           {description}
         </p>
         
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-foreground">Featured Restaurants:</h4>
-          <div className="flex flex-wrap gap-1">
-            {restaurants.slice(0, 3).map((restaurant, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {restaurant}
-              </Badge>
-            ))}
-            {restaurants.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{restaurants.length - 3} more
-              </Badge>
-            )}
+        <div className="space-y-3">
+          <div>
+            <h4 className="text-sm font-medium text-foreground flex items-center gap-1 mb-2">
+              Featured Restaurants:
+              {restaurants.some(r => r.michelinMentioned) && (
+                <Award className="w-3 h-3 text-secondary" />
+              )}
+            </h4>
+            <div className="flex flex-wrap gap-1">
+              {restaurants.slice(0, 3).map((restaurant, index) => (
+                <Badge 
+                  key={index} 
+                  variant={restaurant.michelinMentioned ? "default" : "outline"} 
+                  className="text-xs"
+                >
+                  {restaurant.name}
+                  {restaurant.michelinMentioned && " ⭐"}
+                </Badge>
+              ))}
+              {restaurants.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{restaurants.length - 3} more
+                </Badge>
+              )}
+            </div>
           </div>
+          
+          {highlights && highlights.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-foreground mb-2">Highlights:</h4>
+              <div className="flex flex-wrap gap-1">
+                {highlights.slice(0, 4).map((highlight, index) => (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {highlight}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
       
