@@ -8,6 +8,7 @@ import RouteDetail from "./pages/RouteDetail";
 import NotFound from "./pages/NotFound";
 import { Login } from "./pages/Login";
 import { Admin } from "./pages/Admin";
+import { RestaurantPage } from "./pages/RestaurantPage";
 import { AdminRoutes } from "./pages/admin/AdminRoutes";
 import { AdminRestaurants } from "./pages/admin/AdminRestaurants";
 import { AdminMenus } from "./pages/admin/AdminMenus";
@@ -28,6 +29,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/route/:routeId" element={<RouteDetail />} />
+          <Route path="/restaurants/:slug" element={<RestaurantPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
           <Route path="/admin/restaurants" element={<ProtectedRoute><AdminRestaurants /></ProtectedRoute>} />

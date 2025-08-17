@@ -101,7 +101,14 @@ export const RouteCard = ({
 
         {/* Restaurants */}
         <div className="text-sm text-gray-600">
-          {restaurants.slice(0, 2).map(r => r.name).join(', ')}
+          {restaurants.slice(0, 2).map((r, index) => (
+            <span key={index}>
+              <span className="hover:text-primary transition-colors cursor-pointer">
+                {r.name}
+              </span>
+              {index < Math.min(restaurants.length, 2) - 1 && ', '}
+            </span>
+          ))}
           {restaurants.length > 2 && ` +${restaurants.length - 2} flere`}
         </div>
 

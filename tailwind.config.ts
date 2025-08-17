@@ -17,7 +17,16 @@ export default {
 				'2xl': '1400px'
 			}
 		},
-		extend: {
+    extend: {
+      // Add line-clamp support for text truncation
+      lineClamp: {
+        1: '1',
+        2: '2',
+        3: '3',
+        4: '4',
+        5: '5',
+        6: '6',
+      },
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
