@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addDays, startOfToday, isSameDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -107,135 +105,124 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
   const canNavigateRight = dateOffset < 30; // Limit to 30 days ahead
 
   return (
-    <div className="space-y-4">
-      {/* Horizontal Date Selector */}
-      <Card className="border-border/40">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between text-base font-medium">
-            <span className="flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4 text-primary flex-shrink-0" />
-              <span>Select Date</span>
-            </span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDateOffset(Math.max(0, dateOffset - 7))}
-                disabled={!canNavigateLeft}
-                className="h-7 w-7 p-0 hover:bg-muted/50"
-              >
-                <ChevronLeft className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDateOffset(dateOffset + 7)}
-                disabled={!canNavigateRight}
-                className="h-7 w-7 p-0 hover:bg-muted/50"
-              >
-                <ChevronRight className="h-3 w-3" />
-              </Button>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pb-4">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-            {visibleDates.map((date, index) => {
-              const isAvailable = isDateAvailable(date);
-              const isSelected = selectedDate && isSameDay(selectedDate, date);
-              
-              return (
-                <Button
-                  key={index}
-                  variant={isSelected ? "default" : "ghost"}
-                  size="sm"
-                  disabled={!isAvailable}
-                  onClick={() => handleDateSelect(date)}
-                  className={cn(
-                    "flex flex-col items-center flex-shrink-0 w-[52px] h-[60px] p-1 text-xs hover:bg-muted/50",
-                    isSelected && "bg-primary text-primary-foreground hover:bg-primary/90",
-                    !isSelected && !isAvailable && "opacity-30 cursor-not-allowed",
-                    !isSelected && isAvailable && "border border-border/40"
-                  )}
-                >
-                  <div className="text-[10px] font-medium leading-tight">
-                    {format(date, 'EEE')}
-                  </div>
-                  <div className="text-lg font-bold leading-none mt-1">
-                    {format(date, 'd')}
-                  </div>
-                  <div className="text-[9px] leading-tight mt-0.5">
-                    {format(date, 'MMM')}
-                  </div>
-                </Button>
-              );
-            })}
+    <div className="space-y-6">
+      {/* Date Selection - Airbnb Style */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-foreground">Select dates</h3>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setDateOffset(Math.max(0, dateOffset - 7))}
+              disabled={!canNavigateLeft}
+              className="h-8 w-8 p-0 rounded-full hover:bg-muted"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setDateOffset(dateOffset + 7)}
+              disabled={!canNavigateRight}
+              className="h-8 w-8 p-0 rounded-full hover:bg-muted"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+          {visibleDates.map((date, index) => {
+            const isAvailable = isDateAvailable(date);
+            const isSelected = selectedDate && isSameDay(selectedDate, date);
+            
+            return (
+              <button
+                key={index}
+                disabled={!isAvailable}
+                onClick={() => handleDateSelect(date)}
+                className={cn(
+                  "flex flex-col items-center justify-center min-w-[48px] h-[48px] p-2 rounded-xl border transition-all duration-200 flex-shrink-0",
+                  isSelected 
+                    ? "bg-foreground text-background border-foreground" 
+                    : isAvailable 
+                      ? "bg-background text-foreground border-border hover:border-foreground/40" 
+                      : "bg-muted/30 text-muted-foreground border-border cursor-not-allowed opacity-50"
+                )}
+              >
+                <div className="text-[10px] font-medium leading-none">
+                  {format(date, 'EEE').toUpperCase()}
+                </div>
+                <div className="text-sm font-semibold leading-none mt-1">
+                  {format(date, 'd')}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-      {/* Time Slots List */}
+      {/* Time Selection - Airbnb Style */}
       {selectedDate && (
-        <Card className="border-border/40">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base font-medium">
-              <Clock className="w-4 h-4 text-primary flex-shrink-0" />
-              <span>Available Times</span>
-              <span className="text-sm font-normal text-muted-foreground">
-                {format(selectedDate, 'EEE, MMM d')}
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4">
-            {loading ? (
-              <div className="text-center py-6 text-muted-foreground text-sm">
-                Loading available times...
-              </div>
-            ) : availableSlots.length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground text-sm">
-                No available times for this date.<br />
-                <span className="text-xs">Please select another date.</span>
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {availableSlots.map((slot) => {
-                  const isSelected = selectedTimeSlot?.id === slot.id;
-                  const isLowAvailability = slot.available_spots <= 3;
-                  
-                  return (
-                    <Button
-                      key={slot.id}
-                      variant={isSelected ? "default" : "ghost"}
-                      onClick={() => handleTimeSlotSelect(slot)}
-                      className={cn(
-                        "w-full h-10 px-3 py-2 flex items-center justify-between text-sm hover:bg-muted/50",
-                        isSelected && "bg-primary text-primary-foreground hover:bg-primary/90",
-                        !isSelected && "border border-border/40"
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        <span className="font-medium">
-                          {format(new Date(`2000-01-01T${slot.start_time}`), 'HH:mm')}
-                        </span>
+        <div>
+          <h3 className="text-lg font-semibold text-foreground mb-4">
+            Select time for {format(selectedDate, 'EEEE, MMMM d')}
+          </h3>
+          
+          {loading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Loading available times...
+            </div>
+          ) : availableSlots.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No available times for this date.</p>
+              <p className="text-sm mt-1">Please select another date.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {availableSlots.map((slot) => {
+                const isSelected = selectedTimeSlot?.id === slot.id;
+                const isLowAvailability = slot.available_spots <= 3;
+                
+                return (
+                  <button
+                    key={slot.id}
+                    onClick={() => handleTimeSlotSelect(slot)}
+                    className={cn(
+                      "w-full p-4 rounded-xl border transition-all duration-200 text-left",
+                      isSelected 
+                        ? "bg-foreground text-background border-foreground" 
+                        : "bg-background text-foreground border-border hover:border-foreground/40"
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          <span className="font-medium">
+                            {format(new Date(`2000-01-01T${slot.start_time}`), 'h:mm a')}
+                          </span>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
+                        <span className={cn(
+                          "text-sm",
+                          isSelected ? "text-background/80" : "text-muted-foreground"
+                        )}>
                           {slot.available_spots} {slot.available_spots === 1 ? 'spot' : 'spots'} left
                         </span>
-                        {isLowAvailability && (
-                          <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
-                            Low
-                          </Badge>
+                        {isLowAvailability && !isSelected && (
+                          <div className="w-2 h-2 bg-destructive rounded-full"></div>
                         )}
                       </div>
-                    </Button>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
