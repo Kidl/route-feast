@@ -2,10 +2,11 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { RouteCard } from "@/components/RouteCard";
 import { Button } from "@/components/ui/button";
-import { mockRoutes } from "@/data/mockRoutes";
-import { MapPin, Clock, Users, Star, ArrowRight } from "lucide-react";
+import { useRoutes } from "@/hooks/useRoutes";
+import { MapPin, Clock, Users, Star, ArrowRight, Loader2 } from "lucide-react";
 
 const Index = () => {
+  const { routes, loading, error } = useRoutes();
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -25,9 +26,34 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {mockRoutes.map((route) => (
-              <RouteCard key={route.id} {...route} />
-            ))}
+            {loading ? (
+              <div className="col-span-full flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-2 text-muted-foreground">Loading routes...</span>
+              </div>
+            ) : error ? (
+              <div className="col-span-full text-center py-12 text-red-600">
+                {error}
+              </div>
+            ) : (
+              routes.map((route) => (
+                <RouteCard 
+                  key={route.id} 
+                  id={route.id}
+                  name={route.name}
+                  description={route.description}
+                  image={route.image_url}
+                  price={Math.round(route.price_nok / 100)} // Convert from øre to NOK
+                  duration={`${route.duration_hours} hours`}
+                  maxCapacity={route.max_capacity}
+                  currentBookings={Math.floor(route.max_capacity * 0.6)} // Simulate bookings
+                  rating={4.8}
+                  restaurants={route.restaurants}
+                  location={route.location}
+                  highlights={route.highlights}
+                />
+              ))
+            )}
           </div>
           
           <div className="text-center">

@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Users, Star, Award } from "lucide-react";
 import { Restaurant } from "@/data/mockRoutes";
+import { BookingDialog } from "./booking/BookingDialog";
 
 interface RouteCardProps {
   id: string;
@@ -20,6 +22,7 @@ interface RouteCardProps {
 }
 
 export const RouteCard = ({
+  id,
   name,
   description,
   image,
@@ -32,6 +35,7 @@ export const RouteCard = ({
   location,
   highlights,
 }: RouteCardProps) => {
+  const [bookingOpen, setBookingOpen] = useState(false);
   const availableSpots = maxCapacity - currentBookings;
   const isAlmostFull = availableSpots <= 3;
 
@@ -131,6 +135,7 @@ export const RouteCard = ({
       
       <CardFooter className="pt-0">
         <Button 
+          onClick={() => setBookingOpen(true)}
           className="w-full" 
           variant={isAlmostFull ? "premium" : "default"}
           size="lg"
@@ -138,6 +143,14 @@ export const RouteCard = ({
           {isAlmostFull ? "Book Now - Limited Spots!" : "Book This Route"}
         </Button>
       </CardFooter>
+      
+      <BookingDialog 
+        route={{
+          id, name, description, image, price, duration, maxCapacity, currentBookings, rating, restaurants, location, highlights
+        }}
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+      />
     </Card>
   );
 };
