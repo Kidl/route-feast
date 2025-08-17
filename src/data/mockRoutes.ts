@@ -108,7 +108,7 @@ export const mockRoutes: Route[] = [
       pedersgataRestaurants.find(r => r.name === "Sabi Omakase")!,
       pedersgataRestaurants.find(r => r.name === "Bravo")!,
       pedersgataRestaurants.find(r => r.name === "Bellies")!
-    ],
+    ].filter(Boolean), // Filter out any undefined values
     location: "Stavanger Sentrum",
     highlights: ["Michelin-starred dining", "Sustainable ingredients", "Premium omakase", "Natural wines"]
   },
@@ -126,7 +126,7 @@ export const mockRoutes: Route[] = [
       pedersgataRestaurants.find(r => r.name === "An Nam")!,
       pedersgataRestaurants.find(r => r.name === "Kansui")!,
       pedersgataRestaurants.find(r => r.name === "Miyako")!
-    ],
+    ].filter(Boolean), // Filter out any undefined values
     location: "Pedersgata Area",
     highlights: ["Vietnamese journey", "Authentic ramen", "Asian fusion", "Traditional techniques"]
   },
@@ -144,7 +144,7 @@ export const mockRoutes: Route[] = [
       pedersgataRestaurants.find(r => r.name === "Casa Gio")!,
       pedersgataRestaurants.find(r => r.name === "Delicatessen Tapasbar")!,
       pedersgataRestaurants.find(r => r.name === "Meze Restaurant")!
-    ],
+    ].filter(Boolean), // Filter out any undefined values
     location: "Stavanger Old Town",
     highlights: ["Fresh pasta", "Spanish tapas", "Mediterranean mezze", "Wine pairings"]
   }

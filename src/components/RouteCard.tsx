@@ -2,14 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Users, Star, Award } from "lucide-react";
-
-interface Restaurant {
-  name: string;
-  cuisine: string;
-  description: string;
-  specialties?: string[];
-  michelinMentioned?: boolean;
-}
+import { Restaurant } from "@/data/mockRoutes";
 
 interface RouteCardProps {
   id: string;
