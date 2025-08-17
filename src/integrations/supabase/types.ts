@@ -266,7 +266,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      decrease_available_spots: {
+        Args: { schedule_id: string; spots_to_decrease: number }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
