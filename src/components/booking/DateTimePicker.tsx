@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addDays, startOfToday, isSameDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -107,14 +107,14 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
   const canNavigateRight = dateOffset < 30; // Limit to 30 days ahead
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Horizontal Date Selector */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2 truncate">
+      <Card className="border-border/40">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center justify-between text-base font-medium">
+            <span className="flex items-center gap-2">
               <CalendarIcon className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="truncate">Select Date</span>
+              <span>Select Date</span>
             </span>
             <div className="flex items-center gap-1">
               <Button
@@ -122,24 +122,24 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                 size="sm"
                 onClick={() => setDateOffset(Math.max(0, dateOffset - 7))}
                 disabled={!canNavigateLeft}
-                className="h-8 w-8 p-0"
+                className="h-7 w-7 p-0 hover:bg-muted/50"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3 w-3" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setDateOffset(dateOffset + 7)}
                 disabled={!canNavigateRight}
-                className="h-8 w-8 p-0"
+                className="h-7 w-7 p-0 hover:bg-muted/50"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3 w-3" />
               </Button>
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-2">
+        <CardContent className="pb-4">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
             {visibleDates.map((date, index) => {
               const isAvailable = isDateAvailable(date);
               const isSelected = selectedDate && isSameDay(selectedDate, date);
@@ -147,22 +147,24 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
               return (
                 <Button
                   key={index}
-                  variant={isSelected ? "default" : "outline"}
+                  variant={isSelected ? "default" : "ghost"}
                   size="sm"
                   disabled={!isAvailable}
                   onClick={() => handleDateSelect(date)}
                   className={cn(
-                    "flex flex-col items-center flex-shrink-0 w-[58px] h-12 p-1 text-xs overflow-hidden",
-                    !isAvailable && "opacity-30"
+                    "flex flex-col items-center flex-shrink-0 w-[52px] h-[60px] p-1 text-xs hover:bg-muted/50",
+                    isSelected && "bg-primary text-primary-foreground hover:bg-primary/90",
+                    !isSelected && !isAvailable && "opacity-30 cursor-not-allowed",
+                    !isSelected && isAvailable && "border border-border/40"
                   )}
                 >
-                  <div className="text-[9px] font-medium leading-none truncate w-full text-center">
+                  <div className="text-[10px] font-medium leading-tight">
                     {format(date, 'EEE')}
                   </div>
-                  <div className="text-sm font-bold leading-none mt-0.5 truncate w-full text-center">
+                  <div className="text-lg font-bold leading-none mt-1">
                     {format(date, 'd')}
                   </div>
-                  <div className="text-[9px] leading-none mt-0.5 truncate w-full text-center">
+                  <div className="text-[9px] leading-tight mt-0.5">
                     {format(date, 'MMM')}
                   </div>
                 </Button>
@@ -172,26 +174,30 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
         </CardContent>
       </Card>
 
-      {/* Time Slots Grid */}
+      {/* Time Slots List */}
       {selectedDate && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm truncate">
+        <Card className="border-border/40">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base font-medium">
               <Clock className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="truncate">Times - {format(selectedDate, 'EEE, MMM d')}</span>
+              <span>Available Times</span>
+              <span className="text-sm font-normal text-muted-foreground">
+                {format(selectedDate, 'EEE, MMM d')}
+              </span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-4">
             {loading ? (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-6 text-muted-foreground text-sm">
                 Loading available times...
               </div>
             ) : availableSlots.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No available times for this date. Please select another date.
+              <div className="text-center py-6 text-muted-foreground text-sm">
+                No available times for this date.<br />
+                <span className="text-xs">Please select another date.</span>
               </div>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+              <div className="space-y-2 max-h-48 overflow-y-auto">
                 {availableSlots.map((slot) => {
                   const isSelected = selectedTimeSlot?.id === slot.id;
                   const isLowAvailability = slot.available_spots <= 3;
@@ -199,27 +205,29 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                   return (
                     <Button
                       key={slot.id}
-                      variant={isSelected ? "default" : "outline"}
+                      variant={isSelected ? "default" : "ghost"}
                       onClick={() => handleTimeSlotSelect(slot)}
                       className={cn(
-                        "flex flex-col items-center justify-center h-14 p-1.5 text-xs overflow-hidden",
-                        isSelected && "ring-2 ring-primary/20"
+                        "w-full h-10 px-3 py-2 flex items-center justify-between text-sm hover:bg-muted/50",
+                        isSelected && "bg-primary text-primary-foreground hover:bg-primary/90",
+                        !isSelected && "border border-border/40"
                       )}
                     >
-                      <div className="flex items-center gap-0.5 mb-1 min-w-0">
-                        <Clock className="w-3 h-3 flex-shrink-0" />
-                        <span className="font-medium text-[11px] leading-none truncate">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        <span className="font-medium">
                           {format(new Date(`2000-01-01T${slot.start_time}`), 'HH:mm')}
                         </span>
                       </div>
-                      <div className="flex items-center gap-0.5 min-w-0">
-                        <Users className="w-3 h-3 flex-shrink-0" />
-                        <Badge 
-                          variant={isLowAvailability ? "destructive" : "secondary"}
-                          className="text-[9px] px-1 py-0 leading-none min-w-0 truncate"
-                        >
-                          {slot.available_spots}
-                        </Badge>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {slot.available_spots} {slot.available_spots === 1 ? 'spot' : 'spots'} left
+                        </span>
+                        {isLowAvailability && (
+                          <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+                            Low
+                          </Badge>
+                        )}
                       </div>
                     </Button>
                   );
