@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Users, Star, Award, Eye } from "lucide-react";
+import { Star, Heart, MapPin } from "lucide-react";
 import { Restaurant } from "@/data/mockRoutes";
 import { BookingDialog } from "./booking/BookingDialog";
 
@@ -37,122 +35,90 @@ export const RouteCard = ({
   highlights,
 }: RouteCardProps) => {
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const availableSpots = maxCapacity - currentBookings;
-  const isAlmostFull = availableSpots <= 3;
 
   return (
-    <Card className="overflow-hidden shadow-card hover:shadow-hover transition-smooth bg-gradient-card group cursor-pointer">
-      <div className="relative overflow-hidden">
-        <img 
-          src={image} 
-          alt={name}
-          className="w-full h-64 object-cover transition-smooth group-hover:scale-105"
-        />
-        <div className="absolute top-4 right-4">
-          <Badge variant={isAlmostFull ? "destructive" : "secondary"} className="bg-white/90 text-foreground">
-            {availableSpots} spots left
-          </Badge>
-        </div>
-        <div className="absolute bottom-4 left-4">
-          <Badge className="bg-primary text-primary-foreground font-semibold">
-            {price} NOK
-          </Badge>
+    <div className="group cursor-pointer">
+      {/* Image Container */}
+      <div className="relative mb-3">
+        <Link to={`/route/${id}`}>
+          <img 
+            src={image} 
+            alt={name}
+            className="w-full h-72 object-cover rounded-xl"
+          />
+        </Link>
+        
+        {/* Heart Icon */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setIsLiked(!isLiked);
+          }}
+          className="absolute top-3 right-3 p-2 hover:scale-105 transition-transform"
+        >
+          <Heart 
+            className={`w-6 h-6 ${isLiked ? 'fill-red-500 text-red-500' : 'fill-black/50 text-white'}`}
+          />
+        </button>
+
+        {/* Price Badge */}
+        <div className="absolute bottom-3 left-3">
+          <div className="bg-white px-2 py-1 rounded-md shadow-sm">
+            <span className="text-sm font-semibold">{price} NOK</span>
+          </div>
         </div>
       </div>
-      
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <h3 className="text-xl font-semibold font-heading text-foreground group-hover:text-primary transition-smooth">
-            {name}
-          </h3>
-          <div className="flex items-center gap-1 text-secondary">
-            <Star className="w-4 h-4 fill-current" />
+
+      {/* Content */}
+      <div className="space-y-1">
+        {/* Location and Rating */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 text-gray-600">
+            <MapPin className="w-4 h-4" />
+            <span className="text-sm font-medium">{location}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 fill-current text-black" />
             <span className="text-sm font-medium">{rating}</span>
           </div>
         </div>
-        
-        <div className="flex items-center gap-4 text-muted-foreground text-sm">
-          <div className="flex items-center gap-1">
-            <MapPin className="w-4 h-4" />
-            <span>{location}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            <span>{duration}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            <span>Max {maxCapacity}</span>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="pb-4">
-        <p className="text-muted-foreground leading-relaxed mb-4">
-          {description}
-        </p>
-        
-        <div className="space-y-3">
-          <div>
-            <h4 className="text-sm font-medium text-foreground flex items-center gap-1 mb-2">
-              Featured Restaurants:
-              {restaurants.some(r => r.michelinMentioned) && (
-                <Award className="w-3 h-3 text-secondary" />
-              )}
-            </h4>
-            <div className="flex flex-wrap gap-1">
-              {restaurants.slice(0, 3).map((restaurant, index) => (
-                <Badge 
-                  key={index} 
-                  variant={restaurant.michelinMentioned ? "default" : "outline"} 
-                  className="text-xs"
-                >
-                  {restaurant.name}
-                  {restaurant.michelinMentioned && " ⭐"}
-                </Badge>
-              ))}
-              {restaurants.length > 3 && (
-                <Badge variant="outline" className="text-xs">
-                  +{restaurants.length - 3} more
-                </Badge>
-              )}
-            </div>
-          </div>
-          
-          {highlights && highlights.length > 0 && (
-            <div>
-              <h4 className="text-sm font-medium text-foreground mb-2">Highlights:</h4>
-              <div className="flex flex-wrap gap-1">
-                {highlights.slice(0, 4).map((highlight, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {highlight}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </CardContent>
-      
-      <CardFooter className="pt-0 space-y-3">
-        <Button 
-          onClick={() => setBookingOpen(true)}
-          className="w-full" 
-          variant={isAlmostFull ? "premium" : "default"}
-          size="lg"
-        >
-          {isAlmostFull ? "Book Now!" : "Book Route"}
-        </Button>
-        
-        <Link 
-          to={`/route/${id}`} 
-          className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full py-2"
-        >
-          <Eye className="w-4 h-4" />
-          View Details
+
+        {/* Title */}
+        <Link to={`/route/${id}`}>
+          <h3 className="text-base font-medium text-gray-900 group-hover:text-gray-600 transition-colors">
+            {name}
+          </h3>
         </Link>
-      </CardFooter>
-      
+
+        {/* Duration and Spots */}
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span>{duration}</span>
+          <span>•</span>
+          <span>{availableSpots} spots left</span>
+        </div>
+
+        {/* Restaurants */}
+        <div className="text-sm text-gray-600">
+          {restaurants.slice(0, 2).map(r => r.name).join(', ')}
+          {restaurants.length > 2 && ` +${restaurants.length - 2} more`}
+        </div>
+
+        {/* Book Button */}
+        <div className="pt-2">
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              setBookingOpen(true);
+            }}
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3"
+          >
+            Reserve
+          </Button>
+        </div>
+      </div>
+
       <BookingDialog 
         route={{
           id: id,
@@ -171,6 +137,6 @@ export const RouteCard = ({
         open={bookingOpen}
         onOpenChange={setBookingOpen}
       />
-    </Card>
+    </div>
   );
 };
