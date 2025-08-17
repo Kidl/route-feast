@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Upload, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,6 +42,9 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
   const [highlights, setHighlights] = useState<string[]>([]);
   const [newHighlight, setNewHighlight] = useState("");
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<RouteFormData>({
@@ -71,6 +74,8 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
         is_active: route.is_active,
       });
       setHighlights(route.highlights || []);
+      setImagePreview(route.image_url || null);
+      setImageFile(null);
     } else {
       form.reset({
         name: "",
@@ -83,6 +88,8 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
         is_active: true,
       });
       setHighlights([]);
+      setImagePreview(null);
+      setImageFile(null);
     }
   }, [route, form]);
 
@@ -97,9 +104,99 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
     setHighlights(highlights.filter(h => h !== highlight));
   };
 
+  const handleImageUpload = async (file: File): Promise<string | null> => {
+    try {
+      setUploadingImage(true);
+      
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('route-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (error) {
+        console.error('Upload error:', error);
+        throw error;
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('route-images')
+        .getPublicUrl(data.path);
+
+      return urlData.publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Feil",
+        description: "Kunne ikke laste opp bildet.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Ugyldig filtype",
+          description: "Vennligst velg en bildefil.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Fil for stor",
+          description: "Bildet må være mindre enn 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setImageFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    form.setValue("image_url", "");
+  };
+
   const onSubmit = async (data: RouteFormData) => {
     try {
       setLoading(true);
+      
+      let imageUrl = data.image_url;
+      
+      // Upload new image if selected
+      if (imageFile) {
+        const uploadedUrl = await handleImageUpload(imageFile);
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+        }
+      }
       
       const routeData = {
         name: data.name,
@@ -108,7 +205,7 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
         duration_hours: data.duration_hours,
         max_capacity: data.max_capacity,
         location: data.location,
-        image_url: data.image_url || null,
+        image_url: imageUrl || null,
         is_active: data.is_active,
         highlights,
         restaurants: route?.restaurants || [],
@@ -257,12 +354,56 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image_url">Bilde URL</Label>
-              <Input
-                id="image_url"
-                {...form.register("image_url")}
-                placeholder="https://example.com/image.jpg"
-              />
+              <Label>Rutebilde</Label>
+              
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative inline-block">
+                  <img 
+                    src={imagePreview} 
+                    alt="Route preview" 
+                    className="w-32 h-24 object-cover rounded-lg border"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                    onClick={removeImage}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+              
+              {/* File Upload */}
+              <div className="flex gap-2">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <Label
+                  htmlFor="image-upload"
+                  className="flex items-center gap-2 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer transition-colors"
+                >
+                  <Upload className="h-4 w-4" />
+                  {uploadingImage ? "Laster opp..." : "Velg bilde"}
+                </Label>
+                
+                {/* URL Input as alternative */}
+                <Input
+                  placeholder="Eller skriv inn bilde-URL"
+                  {...form.register("image_url")}
+                  className="flex-1"
+                />
+              </div>
+              
+              <p className="text-xs text-muted-foreground">
+                Maksimal filstørrelse: 5MB. Støttede formater: JPG, PNG, WebP
+              </p>
             </div>
 
             <div className="space-y-4">
