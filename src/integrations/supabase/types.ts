@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          permissions: string[] | null
+          role: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permissions?: string[] | null
+          role?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permissions?: string[] | null
+          role?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      booking_events: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          created_by: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_participants: {
         Row: {
           allergies: string | null
@@ -138,6 +200,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      cancellation_rules: {
+        Row: {
+          created_at: string
+          fee_type: string
+          fee_value: number
+          hours_before: number
+          id: string
+          is_active: boolean | null
+          message: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fee_type?: string
+          fee_value?: number
+          hours_before?: number
+          id?: string
+          is_active?: boolean | null
+          message?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fee_type?: string
+          fee_value?: number
+          hours_before?: number
+          id?: string
+          is_active?: boolean | null
+          message?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      message_templates: {
+        Row: {
+          body: string
+          channel: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string | null
+          updated_at: string
+          variables: string[] | null
+        }
+        Insert: {
+          body: string
+          channel: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject?: string | null
+          updated_at?: string
+          variables?: string[] | null
+        }
+        Update: {
+          body?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string | null
+          updated_at?: string
+          variables?: string[] | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
