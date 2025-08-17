@@ -49,14 +49,14 @@ export const RouteFilters = ({ onFilterChange }: RouteFiltersProps) => {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-primary" />
-            Filter Routes
+            Filtrer ruter
           </CardTitle>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? 'Hide Filters' : 'Show Filters'}
+            {isOpen ? 'Skjul filtre' : 'Vis filtre'}
           </Button>
         </div>
       </CardHeader>
@@ -67,7 +67,7 @@ export const RouteFilters = ({ onFilterChange }: RouteFiltersProps) => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Search routes, restaurants, or cuisine..."
+              placeholder="Søk ruter, restauranter eller kjøkken..."
               className="pl-10"
               value={filters.searchTerm}
               onChange={(e) => updateFilter('searchTerm', e.target.value)}
@@ -77,46 +77,46 @@ export const RouteFilters = ({ onFilterChange }: RouteFiltersProps) => {
           {/* Filter Controls */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Experience Level</label>
+              <label className="text-sm font-medium">Opplevelsesnivå</label>
               <Select value={filters.experience} onValueChange={(value) => updateFilter('experience', value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Experiences</SelectItem>
-                  <SelectItem value="michelin">Michelin Star</SelectItem>
-                  <SelectItem value="fusion">Asian Fusion</SelectItem>
-                  <SelectItem value="traditional">Traditional</SelectItem>
+                  <SelectItem value="all">Alle opplevelser</SelectItem>
+                  <SelectItem value="michelin">Michelin stjerne</SelectItem>
+                  <SelectItem value="fusion">Asiatisk fusion</SelectItem>
+                  <SelectItem value="traditional">Tradisjonell</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Price Range</label>
+              <label className="text-sm font-medium">Prisklasse</label>
               <Select value={filters.priceRange} onValueChange={(value) => updateFilter('priceRange', value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Prices</SelectItem>
-                  <SelectItem value="budget">Budget (Under 1200 NOK)</SelectItem>
-                  <SelectItem value="mid">Mid-range (1200-1800 NOK)</SelectItem>
+                  <SelectItem value="all">Alle priser</SelectItem>
+                  <SelectItem value="budget">Budsjett (Under 1200 NOK)</SelectItem>
+                  <SelectItem value="mid">Mellomklasse (1200-1800 NOK)</SelectItem>
                   <SelectItem value="premium">Premium (1800+ NOK)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Duration</label>
+              <label className="text-sm font-medium">Varighet</label>
               <Select value={filters.duration} onValueChange={(value) => updateFilter('duration', value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Any Duration</SelectItem>
-                  <SelectItem value="short">Short (2-3 hours)</SelectItem>
-                  <SelectItem value="medium">Medium (3-4 hours)</SelectItem>
-                  <SelectItem value="long">Long (4+ hours)</SelectItem>
+                  <SelectItem value="all">Alle varigheter</SelectItem>
+                  <SelectItem value="short">Kort (2-3 timer)</SelectItem>
+                  <SelectItem value="medium">Medium (3-4 timer)</SelectItem>
+                  <SelectItem value="long">Lang (4+ timer)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -125,7 +125,7 @@ export const RouteFilters = ({ onFilterChange }: RouteFiltersProps) => {
           {/* Active Filters & Clear */}
           {hasActiveFilters && (
             <div className="flex items-center gap-2 pt-2 border-t">
-              <span className="text-sm text-muted-foreground">Active filters:</span>
+              <span className="text-sm text-muted-foreground">Aktive filtre:</span>
               {filters.experience !== 'all' && (
                 <Badge variant="secondary" className="gap-1">
                   {filters.experience}
@@ -168,7 +168,7 @@ export const RouteFilters = ({ onFilterChange }: RouteFiltersProps) => {
                 onClick={clearFilters}
                 className="ml-auto"
               >
-                Clear All
+                Fjern alle
               </Button>
             </div>
           )}

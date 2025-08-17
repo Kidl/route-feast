@@ -69,16 +69,16 @@ const Index = () => {
           
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-6">
-              Featured Culinary Routes
+              Utvalgte kulinariske ruter
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Carefully curated dining experiences that showcase the best of Norwegian cuisine. 
-              Each route tells a unique culinary story through multiple restaurants and cuisines.
+              Nøye kuraterte spiseopplevelser som viser frem det beste av norsk mat. 
+              Hver rute forteller en unik kulinarisk historie gjennom flere restauranter og kjøkken.
             </p>
             
             {filters.searchTerm && (
               <p className="text-muted-foreground mt-2">
-                Showing results for "{filters.searchTerm}" • {filteredRoutes.length} routes found
+                Viser resultater for "{filters.searchTerm}" • {filteredRoutes.length} ruter funnet
               </p>
             )}
           </div>
@@ -87,7 +87,7 @@ const Index = () => {
             {loading ? (
               <div className="col-span-full flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                <span className="ml-2 text-muted-foreground">Loading routes...</span>
+                <span className="ml-2 text-muted-foreground">Laster ruter...</span>
               </div>
             ) : error ? (
               <div className="col-span-full text-center py-12 text-red-600">
@@ -95,14 +95,14 @@ const Index = () => {
               </div>
             ) : filteredRoutes.length === 0 ? (
               <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground text-lg mb-4">No routes match your current filters</p>
+                <p className="text-muted-foreground text-lg mb-4">Ingen ruter matcher dine nåværende filtre</p>
                 <Button variant="outline" onClick={() => setFilters({
                   priceRange: 'all',
                   experience: 'all', 
                   duration: 'all',
                   searchTerm: ''
                 })}>
-                  Clear All Filters
+                  Fjern alle filtre
                 </Button>
               </div>
             ) : (
@@ -114,7 +114,7 @@ const Index = () => {
                   description={route.description}
                   image={route.image_url || ''}
                   price={Math.round(route.price_nok / 100)} // Convert from øre to NOK
-                  duration={`${route.duration_hours} hours`}
+                  duration={`${route.duration_hours} timer`}
                   maxCapacity={route.max_capacity}
                   currentBookings={Math.floor(route.max_capacity * 0.6)} // Simulate bookings
                   rating={4.8}
@@ -128,7 +128,7 @@ const Index = () => {
           
           <div className="text-center">
             <Button variant="outline" size="lg" className="group">
-              View All Routes
+              Se alle ruter
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-smooth" />
             </Button>
           </div>
@@ -140,10 +140,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-6">
-              Why Choose GastroRoute?
+              Hvorfor velge GastroRoute?
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              We make culinary exploration effortless, connecting you with Norway's finest dining experiences.
+              Vi gjør kulinarisk utforskning enkelt, og kobler deg til Norges fineste spiseopplevelser.
             </p>
           </div>
           
@@ -152,32 +152,32 @@ const Index = () => {
               <div className="w-16 h-16 bg-gradient-hero rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-spring shadow-card">
                 <MapPin className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold font-heading text-foreground mb-2">Curated Routes</h3>
-              <p className="text-muted-foreground">Hand-picked restaurant combinations for the perfect culinary journey.</p>
+              <h3 className="text-xl font-semibold font-heading text-foreground mb-2">Kuraterte ruter</h3>
+              <p className="text-muted-foreground">Håndplukkede restaurantkombinasjoner for den perfekte kulinariske reisen.</p>
             </div>
             
             <div className="text-center group">
               <div className="w-16 h-16 bg-gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-spring shadow-card">
                 <Clock className="w-8 h-8 text-secondary-foreground" />
               </div>
-              <h3 className="text-xl font-semibold font-heading text-foreground mb-2">Easy Booking</h3>
-              <p className="text-muted-foreground">Simple one-click booking with instant confirmation and QR codes.</p>
+              <h3 className="text-xl font-semibold font-heading text-foreground mb-2">Enkel booking</h3>
+              <p className="text-muted-foreground">Enkel booking med ett klikk og øyeblikkelig bekreftelse med QR-koder.</p>
             </div>
             
             <div className="text-center group">
               <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-spring shadow-card">
                 <Users className="w-8 h-8 text-primary-foreground" />
               </div>
-              <h3 className="text-xl font-semibold font-heading text-foreground mb-2">Group Friendly</h3>
-              <p className="text-muted-foreground">Perfect for couples, friends, or larger groups with flexible capacity.</p>
+              <h3 className="text-xl font-semibold font-heading text-foreground mb-2">Gruppevennlig</h3>
+              <p className="text-muted-foreground">Perfekt for par, venner eller større grupper med fleksibel kapasitet.</p>
             </div>
             
             <div className="text-center group">
               <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-spring shadow-card">
                 <Star className="w-8 h-8 text-accent-foreground" />
               </div>
-              <h3 className="text-xl font-semibold font-heading text-foreground mb-2">Premium Quality</h3>
-              <p className="text-muted-foreground">Only the finest restaurants and highest quality dining experiences.</p>
+              <h3 className="text-xl font-semibold font-heading text-foreground mb-2">Premium kvalitet</h3>
+              <p className="text-muted-foreground">Kun de fineste restaurantene og høyeste kvalitet på spiseopplevelser.</p>
             </div>
           </div>
         </div>
@@ -188,17 +188,17 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold font-heading text-white mb-6">
-              Ready for Your Culinary Adventure?
+              Klar for ditt kulinariske eventyr?
             </h2>
             <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              Join thousands of food lovers who have discovered Norway's best-kept culinary secrets through our expertly crafted routes.
+              Bli med tusenvis av matelskere som har oppdaget Norges best bevarte kulinariske hemmeligheter gjennom våre ekspertlagde ruter.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="secondary" size="lg" className="min-w-[200px]">
-                Book Your First Route
+                Book din første rute
               </Button>
               <Button variant="outline" size="lg" className="min-w-[200px] bg-white/10 border-white/30 text-white hover:bg-white/20">
-                Learn More
+                Lær mer
               </Button>
             </div>
           </div>
@@ -217,43 +217,43 @@ const Index = () => {
                 <span className="text-xl font-bold font-heading">GastroRoute</span>
               </div>
               <p className="text-white/70 leading-relaxed">
-                Discover Norway's finest culinary experiences through our carefully curated restaurant routes.
+                Oppdag Norges fineste kulinariske opplevelser gjennom våre nøye kuraterte restaurantruter.
               </p>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Routes</h4>
+              <h4 className="font-semibold mb-4">Ruter</h4>
               <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-smooth">Nordic Heritage</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Seafood Trail</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Modern Fusion</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">All Routes</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Nordisk arv</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Sjømat-rute</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Moderne fusion</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Alle ruter</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
+              <h4 className="font-semibold mb-4">Selskap</h4>
               <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-smooth">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Contact</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Partners</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Press</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Om oss</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Kontakt</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Partnere</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Presse</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-smooth">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Booking Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Terms</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Hjelpesenter</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Bookingvilkår</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Personvern</a></li>
+                <li><a href="#" className="hover:text-white transition-smooth">Vilkår</a></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/70">
-            <p>&copy; 2025 GastroRoute. All rights reserved. Made with ❤️ for food lovers.</p>
+            <p>&copy; 2025 GastroRoute. Alle rettigheter reservert. Laget med ❤️ for matelskere.</p>
           </div>
         </div>
       </footer>

@@ -24,23 +24,23 @@ export const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             <a href="#routes" className="text-foreground hover:text-primary transition-smooth font-medium">
-              Routes
+              Ruter
             </a>
             <a href="#about" className="text-foreground hover:text-primary transition-smooth font-medium">
-              About
+              Om oss
             </a>
             <a href="#contact" className="text-foreground hover:text-primary transition-smooth font-medium">
-              Contact
+              Kontakt
             </a>
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
             <Button variant="ghost" size="sm">
-              Sign In
+              Logg inn
             </Button>
             <Button variant="default" size="sm">
-              Book Now
+              Book nå
             </Button>
           </div>
 
@@ -60,20 +60,20 @@ export const Header = () => {
           <div className="md:hidden border-t border-border bg-white/95 backdrop-blur-sm">
             <nav className="flex flex-col gap-4 p-4">
               <a href="#routes" className="text-foreground hover:text-primary transition-smooth font-medium">
-                Routes
+                Ruter
               </a>
               <a href="#about" className="text-foreground hover:text-primary transition-smooth font-medium">
-                About
+                Om oss
               </a>
               <a href="#contact" className="text-foreground hover:text-primary transition-smooth font-medium">
-                Contact
+                Kontakt
               </a>
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
                 <Button variant="ghost" size="sm" className="justify-start">
-                  Sign In
+                  Logg inn
                 </Button>
                 <Button variant="default" size="sm">
-                  Book Now
+                  Book nå
                 </Button>
               </div>
             </nav>
