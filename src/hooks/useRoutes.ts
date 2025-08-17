@@ -26,21 +26,38 @@ export const useRoutes = () => {
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
-        const { data, error } = await supabase
-          .from('routes')
-          .select('*')
+        // First, get routes that have active schedules with available spots
+        const { data: routesWithSchedules, error: schedulesError } = await supabase
+          .from('route_schedules')
+          .select(`
+            route_id,
+            routes!inner(*)
+          `)
           .eq('is_active', true)
-          .order('price_nok', { ascending: true });
+          .gt('available_spots', 0)
+          .gte('available_date', new Date().toISOString().split('T')[0]); // Only future dates
 
-        if (error) throw error;
+        if (schedulesError) throw schedulesError;
+
+        // Extract unique routes from the results
+        const uniqueRoutes = routesWithSchedules?.reduce((acc, item) => {
+          const route = item.routes;
+          if (route && route.is_active && !acc.find(r => r.id === route.id)) {
+            acc.push(route);
+          }
+          return acc;
+        }, [] as any[]) || [];
         
         // Transform the data to ensure restaurants is properly typed
-        const transformedData = (data || []).map(route => ({
+        const transformedData = uniqueRoutes.map(route => ({
           ...route,
           restaurants: Array.isArray(route.restaurants) ? (route.restaurants as unknown) as Restaurant[] : [],
           highlights: Array.isArray(route.highlights) ? route.highlights : [],
           image_url: route.image_url || ''
         }));
+        
+        // Sort by price
+        transformedData.sort((a, b) => a.price_nok - b.price_nok);
         
         setRoutes(transformedData);
       } catch (err) {
