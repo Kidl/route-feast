@@ -208,7 +208,6 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
         image_url: imageUrl || null,
         is_active: data.is_active,
         highlights,
-        restaurants: route?.restaurants || [],
       };
 
       if (route) {

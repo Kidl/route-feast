@@ -18,53 +18,58 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Search, Filter, MoreHorizontal, Edit2, Archive, Image } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Edit2, Archive, MapPin, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { RouteFormDrawer } from "@/components/admin/RouteFormDrawer";
+import { RestaurantFormDrawer } from "@/components/admin/RestaurantFormDrawer";
 
-interface RouteData {
+interface RestaurantData {
   id: string;
   name: string;
-  description: string;
-  price_nok: number;
-  duration_hours: number;
-  max_capacity: number;
-  location: string;
-  image_url?: string;
-  is_active: boolean;
-  highlights: string[];
+  description?: string;
+  address: string;
+  city?: string;
+  lat?: number;
+  lng?: number;
+  phone?: string;
+  email?: string;
+  website?: string;
+  status: string;
   created_at: string;
+  restaurant_images: { id: string; url: string; is_cover: boolean }[];
 }
 
-export function AdminRoutes() {
-  const [routes, setRoutes] = useState<RouteData[]>([]);
+export function AdminRestaurants() {
+  const [restaurants, setRestaurants] = useState<RestaurantData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [editingRoute, setEditingRoute] = useState<RouteData | null>(null);
+  const [editingRestaurant, setEditingRestaurant] = useState<RestaurantData | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    loadRoutes();
+    loadRestaurants();
   }, []);
 
-  const loadRoutes = async () => {
+  const loadRestaurants = async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from("routes")
-        .select("*")
+        .from("restaurants")
+        .select(`
+          *,
+          restaurant_images(id, url, is_cover)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setRoutes(data || []);
+      setRestaurants(data || []);
     } catch (error) {
-      console.error("Error loading routes:", error);
+      console.error("Error loading restaurants:", error);
       toast({
         title: "Feil",
-        description: "Kunne ikke laste ruter.",
+        description: "Kunne ikke laste restauranter.",
         variant: "destructive",
       });
     } finally {
@@ -72,57 +77,55 @@ export function AdminRoutes() {
     }
   };
 
-  const filteredRoutes = routes.filter((route) => {
-    const matchesSearch = route.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      route.location.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredRestaurants = restaurants.filter((restaurant) => {
+    const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      restaurant.city?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === "all" || 
-      (statusFilter === "active" && route.is_active) ||
-      (statusFilter === "inactive" && !route.is_active);
+    const matchesStatus = statusFilter === "all" || restaurant.status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
 
-  const handleArchiveRoute = async (routeId: string, isActive: boolean) => {
+  const handleToggleStatus = async (restaurantId: string, currentStatus: string) => {
     try {
+      const newStatus = currentStatus === "active" ? "inactive" : "active";
       const { error } = await supabase
-        .from("routes")
-        .update({ is_active: !isActive })
-        .eq("id", routeId);
+        .from("restaurants")
+        .update({ status: newStatus })
+        .eq("id", restaurantId);
 
       if (error) throw error;
 
       toast({
         title: "Suksess",
-        description: `Ruten er ${!isActive ? "aktivert" : "arkivert"}.`,
+        description: `Restauranten er ${newStatus === "active" ? "aktivert" : "deaktivert"}.`,
       });
       
-      loadRoutes();
+      loadRestaurants();
     } catch (error) {
-      console.error("Error updating route:", error);
+      console.error("Error updating restaurant:", error);
       toast({
         title: "Feil",
-        description: "Kunne ikke oppdatere ruten.",
+        description: "Kunne ikke oppdatere restauranten.",
         variant: "destructive",
       });
     }
   };
 
-  const handleEditRoute = (route: RouteData) => {
-    setEditingRoute(route);
+  const handleEditRestaurant = (restaurant: RestaurantData) => {
+    setEditingRestaurant(restaurant);
     setDrawerOpen(true);
   };
 
   const handleCreateNew = () => {
-    setEditingRoute(null);
+    setEditingRestaurant(null);
     setDrawerOpen(true);
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("no-NO", {
-      style: "currency",
-      currency: "NOK",
-    }).format(amount);
+  const getCoverImage = (images: { url: string; is_cover: boolean }[]) => {
+    const cover = images.find(img => img.is_cover);
+    return cover?.url || images[0]?.url;
   };
 
   return (
@@ -130,12 +133,12 @@ export function AdminRoutes() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Ruter</h1>
-            <p className="text-muted-foreground">Administrer kulinariske ruter</p>
+            <h1 className="text-2xl font-bold tracking-tight">Restauranter</h1>
+            <p className="text-muted-foreground">Administrer restauranter og deres informasjon</p>
           </div>
           <Button onClick={handleCreateNew} className="gap-2">
             <Plus className="h-4 w-4" />
-            Ny rute
+            Ny restaurant
           </Button>
         </div>
 
@@ -149,7 +152,7 @@ export function AdminRoutes() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Søk ruter..."
+                  placeholder="Søk restauranter..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 h-9"
@@ -178,18 +181,18 @@ export function AdminRoutes() {
           </CardContent>
         </Card>
 
-        {/* Routes Table */}
+        {/* Restaurants Table */}
         <Card>
           <CardContent className="p-0">
             <div className="overflow-auto max-h-[600px]">
               <Table>
                 <TableHeader className="sticky top-0 bg-background">
                   <TableRow>
-                    <TableHead className="w-[40px]"></TableHead>
-                    <TableHead>Rute</TableHead>
-                    <TableHead>Pris</TableHead>
-                    <TableHead>Restauranter</TableHead>
-                    <TableHead>Kapasitet</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead>Restaurant</TableHead>
+                    <TableHead>Adresse</TableHead>
+                    <TableHead>Koordinater</TableHead>
+                    <TableHead>Bilder</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
@@ -205,46 +208,62 @@ export function AdminRoutes() {
                         ))}
                       </TableRow>
                     ))
-                  ) : filteredRoutes.length === 0 ? (
+                  ) : filteredRestaurants.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                        Ingen ruter funnet
+                        Ingen restauranter funnet
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredRoutes.map((route) => (
-                      <TableRow key={route.id} className="h-12">
+                    filteredRestaurants.map((restaurant) => (
+                      <TableRow key={restaurant.id} className="h-12">
                         <TableCell>
-                          {route.image_url ? (
+                          {getCoverImage(restaurant.restaurant_images) ? (
                             <img 
-                              src={route.image_url} 
-                              alt={route.name}
-                              className="w-8 h-8 rounded object-cover"
+                              src={getCoverImage(restaurant.restaurant_images)} 
+                              alt={restaurant.name}
+                              className="w-10 h-8 rounded object-cover"
                             />
                           ) : (
-                            <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
-                              <Image className="h-4 w-4 text-muted-foreground" />
+                            <div className="w-10 h-8 rounded bg-muted flex items-center justify-center">
+                              <Camera className="h-4 w-4 text-muted-foreground" />
                             </div>
                           )}
                         </TableCell>
                         <TableCell>
                           <div>
-                            <div className="font-medium text-sm">{route.name}</div>
-                            <div className="text-xs text-muted-foreground">{route.location}</div>
+                            <div className="font-medium text-sm">{restaurant.name}</div>
+                            <div className="text-xs text-muted-foreground line-clamp-1">
+                              {restaurant.description}
+                            </div>
                           </div>
                         </TableCell>
-                        <TableCell className="font-medium">
-                          {formatCurrency(route.price_nok)}
+                        <TableCell>
+                          <div className="text-sm">
+                            <div>{restaurant.address}</div>
+                            {restaurant.city && (
+                              <div className="text-muted-foreground">{restaurant.city}</div>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm">0</span>
+                          {restaurant.lat && restaurant.lng ? (
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-xs">
+                                {restaurant.lat.toFixed(4)}, {restaurant.lng.toFixed(4)}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">Ikke angitt</span>
+                          )}
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm">{route.max_capacity}</span>
+                          <span className="text-sm">{restaurant.restaurant_images?.length || 0}</span>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={route.is_active ? "default" : "secondary"}>
-                            {route.is_active ? "Aktiv" : "Inaktiv"}
+                          <Badge variant={restaurant.status === "active" ? "default" : "secondary"}>
+                            {restaurant.status === "active" ? "Aktiv" : "Inaktiv"}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -255,15 +274,15 @@ export function AdminRoutes() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEditRoute(route)}>
+                              <DropdownMenuItem onClick={() => handleEditRestaurant(restaurant)}>
                                 <Edit2 className="mr-2 h-4 w-4" />
                                 Rediger
                               </DropdownMenuItem>
                               <DropdownMenuItem 
-                                onClick={() => handleArchiveRoute(route.id, route.is_active)}
+                                onClick={() => handleToggleStatus(restaurant.id, restaurant.status)}
                               >
                                 <Archive className="mr-2 h-4 w-4" />
-                                {route.is_active ? "Arkiver" : "Aktiver"}
+                                {restaurant.status === "active" ? "Deaktiver" : "Aktiver"}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -277,11 +296,11 @@ export function AdminRoutes() {
           </CardContent>
         </Card>
 
-        <RouteFormDrawer
+        <RestaurantFormDrawer
           open={drawerOpen}
           onOpenChange={setDrawerOpen}
-          route={editingRoute}
-          onSave={loadRoutes}
+          restaurant={editingRestaurant}
+          onSave={loadRestaurants}
         />
       </div>
     </AdminLayout>

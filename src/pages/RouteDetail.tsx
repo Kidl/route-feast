@@ -57,7 +57,7 @@ const RouteDetail = () => {
 
         setRoute({
           ...data,
-          restaurants: (data.restaurants as unknown) as Restaurant[] || [],
+          restaurants: [], // Will be populated from route_stops in the future
           highlights: data.highlights || []
         });
       } catch (error) {

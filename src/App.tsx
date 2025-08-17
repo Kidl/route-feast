@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import { Login } from "./pages/Login";
 import { Admin } from "./pages/Admin";
 import { AdminRoutes } from "./pages/admin/AdminRoutes";
+import { AdminRestaurants } from "./pages/admin/AdminRestaurants";
+import { AdminMenus } from "./pages/admin/AdminMenus";
 import { AdminBookings } from "./pages/admin/AdminBookings";
 import { AdminNotifications } from "./pages/admin/AdminNotifications";
 import { AdminExport } from "./pages/admin/AdminExport";
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/route/:routeId" element={<RouteDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="/admin/restaurants" element={<ProtectedRoute><AdminRestaurants /></ProtectedRoute>} />
+          <Route path="/admin/menus" element={<ProtectedRoute><AdminMenus /></ProtectedRoute>} />
           <Route path="/admin/routes" element={<ProtectedRoute><AdminRoutes /></ProtectedRoute>} />
           <Route path="/admin/bookings" element={<ProtectedRoute><AdminBookings /></ProtectedRoute>} />
           <Route path="/admin/notifications" element={<ProtectedRoute><AdminNotifications /></ProtectedRoute>} />

@@ -7,6 +7,8 @@ import {
   FileText,
   Download,
   Home,
+  ChefHat,
+  UtensilsCrossed,
 } from "lucide-react";
 import {
   Sidebar,
@@ -23,6 +25,8 @@ import {
 
 const navigationItems = [
   { title: "Dashboard", url: "/admin", icon: BarChart3 },
+  { title: "Restauranter", url: "/admin/restaurants", icon: ChefHat },
+  { title: "Menyer & Retter", url: "/admin/menus", icon: UtensilsCrossed },
   { title: "Ruter", url: "/admin/routes", icon: Route },
   { title: "Bookinger", url: "/admin/bookings", icon: Calendar },
   { title: "Meldinger", url: "/admin/notifications", icon: FileText },
