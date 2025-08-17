@@ -23,12 +23,12 @@ interface ParticipantFormProps {
 }
 
 const DIETARY_OPTIONS = [
-  'Vegetarian',
-  'Vegan',
-  'Gluten-free',
-  'Dairy-free',
-  'Nut-free',
-  'Pescatarian',
+  'Vegetarianer',
+  'Veganer',
+  'Glutenfri',
+  'Melkefri',
+  'Nøttefri',
+  'Pescetarianer',
   'Halal',
   'Kosher'
 ];
@@ -84,7 +84,7 @@ export const ParticipantForm = ({ maxCapacity, availableSpots, onInfoChange }: P
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="w-5 h-5 text-primary" />
-            Number of People
+            Antall personer
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -101,7 +101,7 @@ export const ParticipantForm = ({ maxCapacity, availableSpots, onInfoChange }: P
             <div className="flex items-center gap-3">
               <span className="text-3xl font-bold text-primary">{numberOfPeople}</span>
               <span className="text-muted-foreground">
-                {numberOfPeople === 1 ? 'person' : 'people'}
+                {numberOfPeople === 1 ? 'person' : 'personer'}
               </span>
             </div>
             
@@ -117,14 +117,14 @@ export const ParticipantForm = ({ maxCapacity, availableSpots, onInfoChange }: P
           
           <div className="mt-4 text-center">
             <Badge variant="secondary" className="text-sm">
-              {availableSpots - numberOfPeople} spots remaining
+              {availableSpots - numberOfPeople} plasser igjen
             </Badge>
           </div>
           
           {numberOfPeople >= availableSpots - 2 && (
             <div className="mt-4 flex items-center gap-2 text-orange-600 bg-orange-50 p-3 rounded-lg">
               <AlertCircle className="w-4 h-4" />
-              <span className="text-sm">Limited availability - book soon!</span>
+              <span className="text-sm">Begrenset tilgjengelighet - book snart!</span>
             </div>
           )}
         </CardContent>
@@ -132,12 +132,12 @@ export const ParticipantForm = ({ maxCapacity, availableSpots, onInfoChange }: P
 
       <Card>
         <CardHeader>
-          <CardTitle>Dietary Preferences</CardTitle>
+          <CardTitle>Kostpreferanser</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <Label className="text-sm font-medium mb-3 block">
-              Select any dietary requirements (optional)
+              Velg eventuelle kostkrav (valgfritt)
             </Label>
             <div className="flex flex-wrap gap-2">
               {DIETARY_OPTIONS.map((option) => (
@@ -154,10 +154,10 @@ export const ParticipantForm = ({ maxCapacity, availableSpots, onInfoChange }: P
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="allergies">Allergies & Food Restrictions</Label>
+            <Label htmlFor="allergies">Allergier og matrestriksjoner</Label>
             <Textarea
               id="allergies"
-              placeholder="Please list any allergies or food restrictions we should know about..."
+              placeholder="Vennligst oppgi eventuelle allergier eller matrestriksjoner vi bør vite om..."
               value={allergies}
               onChange={(e) => handleAllergiesChange(e.target.value)}
               className="min-h-[80px]"
@@ -168,14 +168,14 @@ export const ParticipantForm = ({ maxCapacity, availableSpots, onInfoChange }: P
 
       <Card>
         <CardHeader>
-          <CardTitle>Special Requests</CardTitle>
+          <CardTitle>Spesielle ønsker</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="special-requests">Additional Information (Optional)</Label>
+            <Label htmlFor="special-requests">Tilleggsinformasjon (Valgfritt)</Label>
             <Textarea
               id="special-requests"
-              placeholder="Any special occasions, accessibility needs, or other requests..."
+              placeholder="Eventuelle spesielle anledninger, tilgjengelighetsbehov eller andre ønsker..."
               value={specialRequests}
               onChange={(e) => handleSpecialRequestsChange(e.target.value)}
               className="min-h-[80px]"

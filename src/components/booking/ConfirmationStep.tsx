@@ -52,8 +52,8 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'GastroRoute Booking Confirmation',
-          text: `My booking for ${route.name} is confirmed! Reference: ${bookingReference}`,
+          title: 'GastroRoute booking bekreftelse',
+          text: `Min booking for ${route.name} er bekreftet! Referanse: ${bookingReference}`,
           url: window.location.origin
         });
       } catch (error) {
@@ -62,7 +62,7 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(
-        `My GastroRoute booking is confirmed!\n\nRoute: ${route.name}\nReference: ${bookingReference}\nDate: ${bookingData.selectedDate?.toLocaleDateString()}\nTime: ${bookingData.selectedTimeSlot?.start_time}`
+        `Min GastroRoute booking er bekreftet!\n\nRute: ${route.name}\nReferanse: ${bookingReference}\nDato: ${bookingData.selectedDate?.toLocaleDateString()}\nTid: ${bookingData.selectedTimeSlot?.start_time}`
       );
     }
   };
@@ -78,9 +78,9 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
           <CheckCircle className="w-10 h-10 text-green-600" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-green-600 mb-2">Booking Confirmed!</h2>
+          <h2 className="text-2xl font-bold text-green-600 mb-2">Booking bekreftet!</h2>
           <p className="text-muted-foreground">
-            Your culinary journey is all set. We can't wait to see you!
+            Din kulinariske reise er klar. Vi gleder oss til å se deg!
           </p>
         </div>
       </div>
@@ -89,10 +89,10 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
       <Card className="border-green-200 bg-green-50">
         <CardContent className="pt-6">
           <div className="space-y-2">
-            <p className="text-sm text-green-700">Booking Reference</p>
+            <p className="text-sm text-green-700">Booking referanse</p>
             <p className="text-2xl font-bold text-green-800">{bookingReference}</p>
             <p className="text-xs text-green-600">
-              Save this reference number for your records
+              Lagre dette referansenummeret for dine opptegnelser
             </p>
           </div>
         </CardContent>
@@ -104,13 +104,13 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
           <CardHeader>
             <CardTitle className="flex items-center justify-center gap-2">
               <QrCode className="w-5 h-5" />
-              Your Digital Ticket
+              Din digitale billett
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-4">
             <img src={qrCodeUrl} alt="Booking QR Code" className="border rounded-lg" />
             <p className="text-sm text-muted-foreground text-center">
-              Show this QR code at the first restaurant to begin your route
+              Vis denne QR-koden på den første restauranten for å begynne ruten din
             </p>
           </CardContent>
         </Card>
@@ -119,7 +119,7 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
       {/* Booking Details */}
       <Card>
         <CardHeader>
-          <CardTitle>Booking Details</CardTitle>
+          <CardTitle>Bookingdetaljer</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-left">
           <div className="flex items-start gap-3">
@@ -134,7 +134,7 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
             <Calendar className="w-5 h-5 text-primary" />
             <div>
               <p className="font-medium">
-                {bookingData.selectedDate?.toLocaleDateString('en-US', {
+                {bookingData.selectedDate?.toLocaleDateString('nb-NO', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
@@ -142,7 +142,7 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
                 })}
               </p>
               <p className="text-sm text-muted-foreground">
-                Starting at {bookingData.selectedTimeSlot?.start_time}
+                Starter klokka {bookingData.selectedTimeSlot?.start_time}
               </p>
             </div>
           </div>
@@ -150,8 +150,8 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
           <div className="flex items-center gap-3">
             <Users className="w-5 h-5 text-primary" />
             <div>
-              <p className="font-medium">{numberOfPeople} {numberOfPeople === 1 ? 'Person' : 'People'}</p>
-              <p className="text-sm text-muted-foreground">Total paid: {total} NOK</p>
+              <p className="font-medium">{numberOfPeople} {numberOfPeople === 1 ? 'Person' : 'Personer'}</p>
+              <p className="text-sm text-muted-foreground">Totalt betalt: {total} NOK</p>
             </div>
           </div>
 
@@ -160,7 +160,7 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
             bookingData.participantInfo?.allergies || 
             bookingData.participantInfo?.specialRequests) && (
             <div className="space-y-2 pt-4 border-t">
-              <h4 className="font-medium text-sm">Special Requirements:</h4>
+              <h4 className="font-medium text-sm">Spesielle krav:</h4>
               {bookingData.participantInfo.dietaryPreferences?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {bookingData.participantInfo.dietaryPreferences.map((pref: string) => (
@@ -170,12 +170,12 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
               )}
               {bookingData.participantInfo.allergies && (
                 <p className="text-sm text-muted-foreground">
-                  <span className="font-medium">Allergies:</span> {bookingData.participantInfo.allergies}
+                  <span className="font-medium">Allergier:</span> {bookingData.participantInfo.allergies}
                 </p>
               )}
               {bookingData.participantInfo.specialRequests && (
                 <p className="text-sm text-muted-foreground">
-                  <span className="font-medium">Special requests:</span> {bookingData.participantInfo.specialRequests}
+                  <span className="font-medium">Spesielle ønsker:</span> {bookingData.participantInfo.specialRequests}
                 </p>
               )}
             </div>
@@ -186,15 +186,15 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
       {/* What's Next */}
       <Card className="bg-blue-50 border-blue-200">
         <CardHeader>
-          <CardTitle className="text-blue-800">What's Next?</CardTitle>
+          <CardTitle className="text-blue-800">Hva skjer nå?</CardTitle>
         </CardHeader>
         <CardContent className="text-left">
           <ul className="space-y-2 text-sm text-blue-700">
-            <li>• Check your email for detailed booking confirmation</li>
-            <li>• Arrive 10 minutes early at the first restaurant</li>
-            <li>• Show your QR code to begin the experience</li>
-            <li>• Follow the route guide between restaurants</li>
-            <li>• Enjoy your culinary journey!</li>
+            <li>• Sjekk e-posten din for detaljert bookingbekreftelse</li>
+            <li>• Ankom 10 minutter tidlig på den første restauranten</li>
+            <li>• Vis din QR-kode for å begynne opplevelsen</li>
+            <li>• Følg ruteguiden mellom restaurantene</li>
+            <li>• Nyt din kulinariske reise!</li>
           </ul>
         </CardContent>
       </Card>
@@ -207,14 +207,14 @@ export const ConfirmationStep = ({ route, bookingData, onClose }: ConfirmationSt
           className="flex-1"
         >
           <Share2 className="w-4 h-4 mr-2" />
-          Share Booking
+          Del booking
         </Button>
         
         <Button
           onClick={onClose}
           className="flex-1"
         >
-          Close
+          Lukk
         </Button>
       </div>
     </div>

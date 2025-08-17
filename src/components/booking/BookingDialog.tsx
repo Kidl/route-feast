@@ -29,10 +29,10 @@ interface BookingData {
 }
 
 const STEPS: { key: BookingStep; label: string; description: string }[] = [
-  { key: 'datetime', label: 'Date & Time', description: 'Choose your preferred slot' },
-  { key: 'participants', label: 'Details', description: 'Participants and preferences' },
-  { key: 'payment', label: 'Payment', description: 'Secure checkout' },
-  { key: 'confirmation', label: 'Confirmed', description: 'Booking confirmed' }
+  { key: 'datetime', label: 'Dato og tid', description: 'Velg din foretrukne tid' },
+  { key: 'participants', label: 'Detaljer', description: 'Deltakere og preferanser' },
+  { key: 'payment', label: 'Betaling', description: 'Sikker utsjekking' },
+  { key: 'confirmation', label: 'Bekreftet', description: 'Booking bekreftet' }
 ];
 
 export const BookingDialog = ({ route, open, onOpenChange }: BookingDialogProps) => {
@@ -191,12 +191,12 @@ export const BookingDialog = ({ route, open, onOpenChange }: BookingDialogProps)
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Back
+                Tilbake
               </Button>
 
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="text-sm">
-                  Step {currentStepIndex + 1} of {STEPS.length}
+                  Steg {currentStepIndex + 1} av {STEPS.length}
                 </Badge>
                 
                 <Button
@@ -204,7 +204,7 @@ export const BookingDialog = ({ route, open, onOpenChange }: BookingDialogProps)
                   disabled={!canProceed()}
                   className="flex items-center gap-2"
                 >
-                  {currentStep === 'payment' ? 'Process Payment' : 'Next'}
+                  {currentStep === 'payment' ? 'Behandle betaling' : 'Neste'}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>

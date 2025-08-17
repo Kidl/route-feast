@@ -28,78 +28,78 @@ export interface Route {
 export const pedersgataRestaurants: Restaurant[] = [
   {
     name: "Restaurant K2",
-    cuisine: "Modern Nordic",
-    description: "Michelin-starred restaurant focusing on ecological, local and sustainable ingredients. Awarded both Michelin star and sustainability clover.",
-    specialties: ["Sustainable Nordic cuisine", "Local ingredients", "Eco-friendly practices"],
+    cuisine: "Moderne nordisk",
+    description: "Michelin-stjernet restaurant som fokuserer på økologiske, lokale og bærekraftige ingredienser. Tildelt både Michelin-stjerne og bærekraftskløver.",
+    specialties: ["Bærekraftig nordisk mat", "Lokale ingredienser", "Miljøvennlige praksis"],
     michelinMentioned: true
   },
   {
     name: "Sabi Omakase", 
-    cuisine: "Japanese Sushi",
-    description: "Michelin-starred sushi restaurant led by chef Roger Asakil Joya. Offering traditional omakase experience with highest quality ingredients.",
-    specialties: ["Omakase experience", "Premium sushi", "Traditional techniques"],
+    cuisine: "Japansk sushi",
+    description: "Michelin-stjernet sushi-restaurant ledet av kokk Roger Asakil Joya. Tilbyr tradisjonell omakase-opplevelse med ingredienser av høyeste kvalitet.",
+    specialties: ["Omakase-opplevelse", "Premium sushi", "Tradisjonelle teknikker"],
     michelinMentioned: true
   },
   {
     name: "Bravo",
-    cuisine: "Modern European",
-    description: "À la carte menu with simple small plates and snacks. Short-traveled ingredients that vary by season. Natural wine list. Mentioned in Michelin Guide.",
-    specialties: ["Seasonal ingredients", "Natural wines", "Small plates"],
+    cuisine: "Moderne europeisk",
+    description: "À la carte-meny med enkle småretter og snacks. Korttreiste ingredienser som varierer etter sesong. Naturlig vinliste. Nevnt i Michelin Guide.",
+    specialties: ["Sesongbaserte ingredienser", "Naturlige viner", "Småretter"],
     michelinMentioned: true
   },
   {
     name: "Bellies",
-    cuisine: "Plant-Based",
-    description: "Exclusively plant-based restaurant creating fantastic dishes that satisfy both the eye and palate. Recommended in Michelin Guide.",
-    specialties: ["Plant-based cuisine", "Creative presentations", "Sustainable dining"],
+    cuisine: "Plantebasert",
+    description: "Utelukkende plantebasert restaurant som lager fantastiske retter som tilfredsstiller både øyet og ganen. Anbefalt i Michelin Guide.",
+    specialties: ["Plantebasert mat", "Kreative presentasjoner", "Bærekraftig spising"],
     michelinMentioned: true
   },
   {
     name: "An Nam",
-    cuisine: "Vietnamese",
-    description: "A dinner at An Nam is like a journey through Vietnam, from rice fields in the north to harbors in the south. Eastern spices and herbs combined with local Norwegian ingredients.",
-    specialties: ["Vietnamese flavors", "Local Norwegian ingredients", "Regional dishes"]
+    cuisine: "Vietnamesisk",
+    description: "En middag på An Nam er som en reise gjennom Vietnam, fra rismarker i nord til havner i sør. Østlige krydder og urter kombinert med lokale norske ingredienser.",
+    specialties: ["Vietnamesiske smaker", "Lokale norske ingredienser", "Regionale retter"]
   },
   {
     name: "Casa Gio",
-    cuisine: "Italian",
-    description: "Serves food made from quality ingredients with few combinations. Fresh pasta, soft ravioli, steaming tagliatelle, risotto and all the good things associated with Italian cuisine.",
-    specialties: ["Fresh pasta", "Ravioli", "Traditional Italian"]
+    cuisine: "Italiensk",
+    description: "Serverer mat laget av kvalitetsingredienser med få kombinasjoner. Fersk pasta, myk ravioli, dampende tagliatelle, risotto og alt det gode forbundet med italiensk mat.",
+    specialties: ["Fersk pasta", "Ravioli", "Tradisjonell italiensk"]
   },
   {
     name: "Delicatessen Tapasbar",
-    cuisine: "Spanish Tapas",
-    description: "Relax and enjoy a glass of wine with delicious tapas of many different kinds. Food created for sharing in pleasant company around a table or in the bar.",
-    specialties: ["Spanish tapas", "Wine selection", "Sharing dishes"]
+    cuisine: "Spansk tapas",
+    description: "Slapp av og nyt et glass vin med deilige tapas av mange forskjellige typer. Mat laget for deling i hyggelig selskap rundt et bord eller i baren.",
+    specialties: ["Spansk tapas", "Vinutvalg", "Deleretter"]
   },
   {
     name: "Kansui",
-    cuisine: "Japanese Ramen",
-    description: "Serves the city's best Japan-style ramen! Several varieties on the menu. Eat like a Japanese and enjoy the meal with long slurps!",
-    specialties: ["Authentic ramen", "Japanese dining style", "Various ramen types"]
+    cuisine: "Japansk ramen",
+    description: "Serverer byens beste ramen i japansk stil! Flere varianter på menyen. Spis som en japaner og nyt måltidet med lange slurk!",
+    specialties: ["Autentisk ramen", "Japansk spisestil", "Ulike ramen-typer"]
   },
   {
     name: "Miyako",
-    cuisine: "Asian Fusion",
-    description: "Asian fusion concept inspired by several eastern Asian countries. Wide selection of sushi, sashimi, tempura and hot dishes, plus vegetarian and vegan options.",
-    specialties: ["Sushi & sashimi", "Tempura", "Vegetarian options"]
+    cuisine: "Asiatisk fusion",
+    description: "Asiatisk fusjonskonsept inspirert av flere østasiatiske land. Bredt utvalg av sushi, sashimi, tempura og varme retter, pluss vegetariske og veganske alternativer.",
+    specialties: ["Sushi og sashimi", "Tempura", "Vegetariske alternativer"]
   },
   {
     name: "Meze Restaurant",
-    cuisine: "Mediterranean",
-    description: "Dinner dishes and small plates from Mediterranean countries served alone or together for a complete meal. Meze is perfect to share with friends!",
-    specialties: ["Mediterranean mezze", "Sharing plates", "Regional specialties"]
+    cuisine: "Middelhavs",
+    description: "Middagsretter og småretter fra middelhavsland servert alene eller sammen for et komplett måltid. Meze er perfekt å dele med venner!",
+    specialties: ["Middelhavs mezze", "Deleretter", "Regionale spesialiteter"]
   }
 ];
 
 export const mockRoutes: Route[] = [
   {
     id: "1",
-    name: "Michelin Experience Stavanger",
-    description: "Embark on a prestigious culinary journey through Stavanger's Michelin-starred and Michelin Guide mentioned restaurants. Experience world-class dining from sustainable Nordic cuisine to innovative plant-based dishes.",
+    name: "Michelin opplevelse Stavanger",
+    description: "Legg ut på en prestisjetung kulinarisk reise gjennom Stavangers Michelin-stjernede og Michelin Guide nevnte restauranter. Opplev verdensklasse spising fra bærekraftig nordisk mat til innovative plantebaserte retter.",
     image: michelinImage,
     price: 2199,
-    duration: "5 hours",
+    duration: "5 timer",
     maxCapacity: 12,
     currentBookings: 9,
     rating: 4.9,
@@ -110,15 +110,15 @@ export const mockRoutes: Route[] = [
       pedersgataRestaurants.find(r => r.name === "Bellies")!
     ].filter(Boolean), // Filter out any undefined values
     location: "Stavanger Sentrum",
-    highlights: ["Michelin-starred dining", "Sustainable ingredients", "Premium omakase", "Natural wines"]
+    highlights: ["Michelin-stjernet spising", "Bærekraftige ingredienser", "Premium omakase", "Naturlige viner"]
   },
   {
     id: "2", 
-    name: "Asian Fusion Journey",
-    description: "Discover the diverse flavors of Asia in Stavanger. From authentic Vietnamese cuisine to traditional Japanese ramen and innovative Asian fusion, experience the continent's culinary diversity.",
+    name: "Asiatisk fusjonreise",
+    description: "Oppdag de mangfoldige smakene av Asia i Stavanger. Fra autentisk vietnamesisk mat til tradisjonell japansk ramen og innovativ asiatisk fusion, opplev kontinentets kulinariske mangfold.",
     image: asianImage,
     price: 1299,
-    duration: "4 hours",
+    duration: "4 timer",
     maxCapacity: 16,
     currentBookings: 12,
     rating: 4.7,
@@ -128,15 +128,15 @@ export const mockRoutes: Route[] = [
       pedersgataRestaurants.find(r => r.name === "Miyako")!
     ].filter(Boolean), // Filter out any undefined values
     location: "Pedersgata Area",
-    highlights: ["Vietnamese journey", "Authentic ramen", "Asian fusion", "Traditional techniques"]
+    highlights: ["Vietnamesisk reise", "Autentisk ramen", "Asiatisk fusion", "Tradisjonelle teknikker"]
   },
   {
     id: "3",
-    name: "Mediterranean Classics",
-    description: "Savor the warmth of Mediterranean cuisine through Italy, Spain, and the Middle East. From handmade pasta to authentic tapas and sharing-style mezze dishes.",
+    name: "Middelhavs klassikere",
+    description: "Nyt varmen fra middelhavs kjøkken gjennom Italia, Spania og Midtøsten. Fra håndlaget pasta til autentiske tapas og delerettsstil mezze retter.",
     image: mediterraneanImage,
     price: 1099,
-    duration: "3.5 hours", 
+    duration: "3,5 timer",
     maxCapacity: 18,
     currentBookings: 14,
     rating: 4.6,
@@ -146,6 +146,6 @@ export const mockRoutes: Route[] = [
       pedersgataRestaurants.find(r => r.name === "Meze Restaurant")!
     ].filter(Boolean), // Filter out any undefined values
     location: "Stavanger Old Town",
-    highlights: ["Fresh pasta", "Spanish tapas", "Mediterranean mezze", "Wine pairings"]
+    highlights: ["Fersk pasta", "Spansk tapas", "Middelhavs mezze", "Vinparing"]
   }
 ];

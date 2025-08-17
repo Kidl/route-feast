@@ -47,8 +47,8 @@ const RouteDetail = () => {
         
         if (!data) {
           toast({
-            title: "Route not found",
-            description: "The requested route could not be found.",
+            title: "Rute ikke funnet",
+            description: "Den forespurte ruten kunne ikke finnes.",
             variant: "destructive"
           });
           navigate('/');
@@ -63,8 +63,8 @@ const RouteDetail = () => {
       } catch (error) {
         console.error('Error fetching route:', error);
         toast({
-          title: "Error",
-          description: "Could not load route details.",
+          title: "Feil",
+          description: "Kunne ikke laste rutedetaljer.",
           variant: "destructive"
         });
         navigate('/');
@@ -81,7 +81,7 @@ const RouteDetail = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading route details...</p>
+          <p className="text-muted-foreground">Laster rutedetaljer...</p>
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ const RouteDetail = () => {
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Routes
+            Tilbake til ruter
           </Button>
         </div>
       </div>
@@ -121,7 +121,7 @@ const RouteDetail = () => {
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 mb-3">
                 <Badge className="bg-white/20 text-white border-white/30">
-                  {route.duration_hours} hours
+                  {route.duration_hours} timer
                 </Badge>
                 <Badge className="bg-white/20 text-white border-white/30">
                   <MapPin className="w-3 h-3 mr-1" />
@@ -148,7 +148,7 @@ const RouteDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Star className="w-5 h-5 text-primary" />
-                    Experience Highlights
+                    Opplevelseshøydepunkter
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -169,7 +169,7 @@ const RouteDetail = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ChefHat className="w-5 h-5 text-primary" />
-                  Featured Restaurants ({route.restaurants.length})
+                  Utvalgte restauranter ({route.restaurants.length})
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -187,7 +187,7 @@ const RouteDetail = () => {
                       </div>
                       {restaurant.michelinMentioned && (
                         <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
-                          Michelin Mentioned
+                          Michelin nevnt
                         </Badge>
                       )}
                     </div>
@@ -197,8 +197,8 @@ const RouteDetail = () => {
                     </p>
                     
                     {restaurant.specialties && restaurant.specialties.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-sm mb-2">Specialties:</h4>
+                        <div>
+                          <h4 className="font-medium text-sm mb-2">Spesialiteter:</h4>
                         <div className="flex flex-wrap gap-1">
                           {restaurant.specialties.map((specialty, idx) => (
                             <Badge key={idx} variant="outline" className="text-xs">
@@ -216,16 +216,16 @@ const RouteDetail = () => {
             {/* What to Expect */}
             <Card>
               <CardHeader>
-                <CardTitle>What to Expect</CardTitle>
+                <CardTitle>Hva du kan forvente</CardTitle>
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none">
                 <ul className="space-y-2">
-                  <li>🕐 <strong>Duration:</strong> Approximately {route.duration_hours} hours of culinary exploration</li>
-                  <li>🚶 <strong>Transportation:</strong> Walking between restaurants with guided routes</li>
-                  <li>👥 <strong>Group Size:</strong> Maximum {route.max_capacity} people for intimate dining</li>
-                  <li>📱 <strong>Check-in:</strong> Show your QR code at the first restaurant to begin</li>
-                  <li>🍽️ <strong>Dining:</strong> Curated menu selections at each restaurant</li>
-                  <li>📍 <strong>Location:</strong> All restaurants located in {route.location}</li>
+                  <li>🕐 <strong>Varighet:</strong> Omtrent {route.duration_hours} timer med kulinarisk utforskning</li>
+                  <li>🚶 <strong>Transport:</strong> Gåing mellom restauranter med guideveier</li>
+                  <li>👥 <strong>Gruppestørrelse:</strong> Maksimum {route.max_capacity} personer for intim spising</li>
+                  <li>📱 <strong>Innsjekking:</strong> Vis din QR-kode på den første restauranten for å begynne</li>
+                  <li>🍽️ <strong>Spising:</strong> Kuraterte menyutvalg på hver restaurant</li>
+                  <li>📍 <strong>Plassering:</strong> Alle restauranter ligger i {route.location}</li>
                 </ul>
               </CardContent>
             </Card>
@@ -235,7 +235,7 @@ const RouteDetail = () => {
           <div className="lg:col-span-1">
             <Card className="sticky top-24">
               <CardHeader>
-                <CardTitle className="text-2xl">Book This Route</CardTitle>
+                <CardTitle className="text-2xl">Book denne ruten</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center">
@@ -249,23 +249,23 @@ const RouteDetail = () => {
                   <div className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      Duration
+                      Varighet
                     </span>
-                    <span>{route.duration_hours} hours</span>
+                    <span>{route.duration_hours} timer</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-2">
                       <Users className="w-4 h-4" />
-                      Max Capacity
+                      Maks kapasitet
                     </span>
-                    <span>{route.max_capacity} people</span>
+                    <span>{route.max_capacity} personer</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      Location
+                      Plassering
                     </span>
                     <span>{route.location}</span>
                   </div>
@@ -278,11 +278,11 @@ const RouteDetail = () => {
                   size="lg" 
                   className="w-full"
                 >
-                  Book Now
+                  Reserver nå
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  Free cancellation up to 24 hours before the experience
+                  Gratis avbestilling inntil 24 timer før opplevelsen
                 </p>
               </CardContent>
             </Card>
@@ -298,7 +298,7 @@ const RouteDetail = () => {
           description: route.description,
           image: route.image_url,
           price: price,
-          duration: `${route.duration_hours} hours`,
+          duration: `${route.duration_hours} timer`,
           maxCapacity: route.max_capacity,
           currentBookings: Math.floor(route.max_capacity * 0.6), // Simulate bookings
           rating: 4.8,
