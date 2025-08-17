@@ -35,6 +35,7 @@ interface RouteData {
   is_active: boolean;
   highlights: string[];
   created_at: string;
+  restaurant_count?: number;
 }
 
 export function AdminRoutes() {
@@ -55,11 +56,22 @@ export function AdminRoutes() {
       setLoading(true);
       const { data, error } = await supabase
         .from("routes")
-        .select("*")
+        .select(`
+          *,
+          route_stops!inner(restaurant_id)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setRoutes(data || []);
+      
+      // Count unique restaurants per route
+      const routesWithCounts = (data || []).map(route => ({
+        ...route,
+        restaurant_count: route.route_stops ? 
+          new Set(route.route_stops.map((stop: any) => stop.restaurant_id)).size : 0
+      }));
+      
+      setRoutes(routesWithCounts);
     } catch (error) {
       console.error("Error loading routes:", error);
       toast({
@@ -119,10 +131,12 @@ export function AdminRoutes() {
   };
 
   const formatCurrency = (amount: number) => {
+    // Convert from øre to kroner (divide by 100)
+    const amountInKroner = amount / 100;
     return new Intl.NumberFormat("no-NO", {
       style: "currency",
       currency: "NOK",
-    }).format(amount);
+    }).format(amountInKroner);
   };
 
   return (
@@ -237,7 +251,7 @@ export function AdminRoutes() {
                           {formatCurrency(route.price_nok)}
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm">0</span>
+                          <span className="text-sm">{route.restaurant_count || 0}</span>
                         </TableCell>
                         <TableCell>
                           <span className="text-sm">{route.max_capacity}</span>
