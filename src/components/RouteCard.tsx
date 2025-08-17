@@ -134,26 +134,23 @@ export const RouteCard = ({
         </div>
       </CardContent>
       
-      <CardFooter className="pt-0 flex gap-2">
-        <Link to={`/route/${id}`} className="flex-1">
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="w-full"
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            View Details
-          </Button>
-        </Link>
-        
+      <CardFooter className="pt-0 space-y-3">
         <Button 
           onClick={() => setBookingOpen(true)}
-          className="flex-1" 
+          className="w-full" 
           variant={isAlmostFull ? "premium" : "default"}
           size="lg"
         >
           {isAlmostFull ? "Book Now!" : "Book Route"}
         </Button>
+        
+        <Link 
+          to={`/route/${id}`} 
+          className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full py-2"
+        >
+          <Eye className="w-4 h-4" />
+          View Details
+        </Link>
       </CardFooter>
       
       <BookingDialog 
