@@ -69,6 +69,36 @@ export class BookingService {
           .eq('id', bookingData.scheduleId);
       }
 
+      // Send confirmation email automatically
+      try {
+        const emailData = {
+          bookingId: booking.id,
+          bookingReference: booking.booking_reference,
+          email: bookingData.userData.email,
+          name: bookingData.userData.name || 'Guest',
+          routeName: `Route ${bookingData.routeId}`, // You might want to fetch actual route name
+          date: new Date().toLocaleDateString(), // You might want to use actual booking date
+          time: "TBD", // You might want to use actual time slot
+          numberOfPeople: bookingData.participantInfo.numberOfPeople,
+          totalAmount: bookingData.totalAmount
+        };
+
+        const { data: emailResponse, error: emailError } = await supabase.functions
+          .invoke('send-booking-confirmation', {
+            body: emailData
+          });
+
+        if (emailError) {
+          console.error('Error sending confirmation email:', emailError);
+          // Don't fail the booking if email fails
+        } else {
+          console.log('Confirmation email sent successfully');
+        }
+      } catch (emailError) {
+        console.error('Email service error:', emailError);
+        // Don't fail the booking if email fails
+      }
+
       return {
         success: true,
         bookingId: booking.id,
