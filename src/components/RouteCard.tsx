@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Users, Star, Award } from "lucide-react";
+import { MapPin, Clock, Users, Star, Award, Eye } from "lucide-react";
 import { Restaurant } from "@/data/mockRoutes";
 import { BookingDialog } from "./booking/BookingDialog";
 
@@ -133,14 +134,25 @@ export const RouteCard = ({
         </div>
       </CardContent>
       
-      <CardFooter className="pt-0">
+      <CardFooter className="pt-0 flex gap-2">
+        <Link to={`/route/${id}`} className="flex-1">
+          <Button 
+            variant="outline" 
+            size="lg"
+            className="w-full"
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            View Details
+          </Button>
+        </Link>
+        
         <Button 
           onClick={() => setBookingOpen(true)}
-          className="w-full" 
+          className="flex-1" 
           variant={isAlmostFull ? "premium" : "default"}
           size="lg"
         >
-          {isAlmostFull ? "Book Now - Limited Spots!" : "Book This Route"}
+          {isAlmostFull ? "Book Now!" : "Book Route"}
         </Button>
       </CardFooter>
       

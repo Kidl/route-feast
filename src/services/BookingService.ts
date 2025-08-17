@@ -53,18 +53,20 @@ export class BookingService {
 
       if (bookingError) throw bookingError;
 
-      // Update route schedule availability
-      const { error: scheduleError } = await supabase.rpc(
-        'decrease_available_spots',
-        {
-          schedule_id: bookingData.scheduleId,
-          spots_to_decrease: bookingData.participantInfo.numberOfPeople
-        }
-      );
+      // Update route schedule availability - simple approach for now
+      // In production, this should be done with a database transaction
+      const { data: currentSchedule, error: fetchError } = await supabase
+        .from('route_schedules')
+        .select('available_spots')
+        .eq('id', bookingData.scheduleId)
+        .single();
 
-      if (scheduleError) {
-        console.warn('Could not update schedule availability:', scheduleError);
-        // Don't throw error as booking is still valid
+      if (!fetchError && currentSchedule) {
+        const newSpots = Math.max(0, currentSchedule.available_spots - bookingData.participantInfo.numberOfPeople);
+        await supabase
+          .from('route_schedules')
+          .update({ available_spots: newSpots })
+          .eq('id', bookingData.scheduleId);
       }
 
       return {

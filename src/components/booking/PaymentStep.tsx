@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { CreditCard, Shield, Apple, Smartphone } from "lucide-react";
 import { Route } from "@/data/mockRoutes";
 import { useToast } from "@/hooks/use-toast";
+import { BookingService, BookingData } from "@/services/BookingService";
 
 interface PaymentStepProps {
   route: Route;
@@ -36,17 +37,37 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
         paymentId: 'pi_' + Math.random().toString(36).substr(2, 9),
         status: 'succeeded'
       };
-      
-      onPaymentComplete(paymentData);
-      
-      toast({
-        title: "Payment Successful!",
-        description: "Your booking has been confirmed."
+
+      // Create booking in database
+      const bookingResult = await BookingService.createBooking({
+        routeId: route.id,
+        scheduleId: bookingData.selectedTimeSlot?.id || '',
+        userType: bookingData.userType,
+        userData: bookingData.userData,
+        participantInfo: bookingData.participantInfo,
+        totalAmount: calculateTotal(),
+        paymentData
       });
+
+      if (bookingResult.success) {
+        onPaymentComplete({
+          ...paymentData,
+          bookingId: bookingResult.bookingId,
+          bookingReference: bookingResult.bookingReference
+        });
+        
+        toast({
+          title: "Payment Successful!",
+          description: "Your booking has been confirmed."
+        });
+      } else {
+        throw new Error(bookingResult.error || 'Booking failed');
+      }
     } catch (error) {
+      console.error('Payment/booking error:', error);
       toast({
         title: "Payment Failed",
-        description: "There was an issue processing your payment. Please try again.",
+        description: error instanceof Error ? error.message : "There was an issue processing your payment. Please try again.",
         variant: "destructive"
       });
     } finally {

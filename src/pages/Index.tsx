@@ -1,12 +1,62 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { RouteCard } from "@/components/RouteCard";
+import { RouteFilters, FilterState } from "@/components/RouteFilters";
 import { Button } from "@/components/ui/button";
 import { useRoutes } from "@/hooks/useRoutes";
 import { MapPin, Clock, Users, Star, ArrowRight, Loader2 } from "lucide-react";
 
 const Index = () => {
   const { routes, loading, error } = useRoutes();
+  const [filters, setFilters] = useState<FilterState>({
+    priceRange: 'all',
+    experience: 'all',
+    duration: 'all',
+    searchTerm: ''
+  });
+
+  // Filter routes based on current filters
+  const filteredRoutes = routes.filter(route => {
+    const price = Math.round(route.price_nok / 100);
+    
+    // Price range filter
+    if (filters.priceRange !== 'all') {
+      if (filters.priceRange === 'budget' && price >= 1200) return false;
+      if (filters.priceRange === 'mid' && (price < 1200 || price >= 1800)) return false;
+      if (filters.priceRange === 'premium' && price < 1800) return false;
+    }
+    
+    // Experience filter
+    if (filters.experience !== 'all') {
+      if (filters.experience === 'michelin' && !route.name.toLowerCase().includes('michelin')) return false;
+      if (filters.experience === 'fusion' && !route.name.toLowerCase().includes('fusion')) return false;
+      if (filters.experience === 'traditional' && !route.name.toLowerCase().includes('mediterranean')) return false;
+    }
+    
+    // Duration filter
+    if (filters.duration !== 'all') {
+      if (filters.duration === 'short' && route.duration_hours >= 3) return false;
+      if (filters.duration === 'medium' && (route.duration_hours < 3 || route.duration_hours >= 4)) return false;
+      if (filters.duration === 'long' && route.duration_hours < 4) return false;
+    }
+    
+    // Search term filter
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      return (
+        route.name.toLowerCase().includes(searchLower) ||
+        route.description.toLowerCase().includes(searchLower) ||
+        route.location.toLowerCase().includes(searchLower) ||
+        route.restaurants.some(r => 
+          r.name?.toLowerCase().includes(searchLower) ||
+          r.cuisine?.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+    
+    return true;
+  });
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -15,6 +65,8 @@ const Index = () => {
       {/* Featured Routes Section */}
       <section id="routes" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
+          <RouteFilters onFilterChange={setFilters} />
+          
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-6">
               Featured Culinary Routes
@@ -23,6 +75,12 @@ const Index = () => {
               Carefully curated dining experiences that showcase the best of Norwegian cuisine. 
               Each route tells a unique culinary story through multiple restaurants and cuisines.
             </p>
+            
+            {filters.searchTerm && (
+              <p className="text-muted-foreground mt-2">
+                Showing results for "{filters.searchTerm}" • {filteredRoutes.length} routes found
+              </p>
+            )}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -35,8 +93,20 @@ const Index = () => {
               <div className="col-span-full text-center py-12 text-red-600">
                 {error}
               </div>
+            ) : filteredRoutes.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground text-lg mb-4">No routes match your current filters</p>
+                <Button variant="outline" onClick={() => setFilters({
+                  priceRange: 'all',
+                  experience: 'all', 
+                  duration: 'all',
+                  searchTerm: ''
+                })}>
+                  Clear All Filters
+                </Button>
+              </div>
             ) : (
-              routes.map((route) => (
+              filteredRoutes.map((route) => (
                 <RouteCard 
                   key={route.id} 
                   id={route.id}
