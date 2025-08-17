@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import { Login } from "./pages/Login";
 import { Admin } from "./pages/Admin";
 import { RestaurantPage } from "./pages/RestaurantPage";
+import { MenuPage } from "./pages/MenuPage";
 import { AdminRoutes } from "./pages/admin/AdminRoutes";
 import { AdminRestaurants } from "./pages/admin/AdminRestaurants";
 import { AdminMenus } from "./pages/admin/AdminMenus";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/route/:routeId" element={<RouteDetail />} />
           <Route path="/restaurants/:slug" element={<RestaurantPage />} />
+          <Route path="/restaurants/:slug/menu" element={<MenuPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
           <Route path="/admin/restaurants" element={<ProtectedRoute><AdminRestaurants /></ProtectedRoute>} />
