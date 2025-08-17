@@ -111,10 +111,10 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
       {/* Horizontal Date Selector */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center justify-between text-base">
-            <span className="flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4 text-primary" />
-              Select Date
+          <CardTitle className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-2 truncate">
+              <CalendarIcon className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="truncate">Select Date</span>
             </span>
             <div className="flex items-center gap-1">
               <Button
@@ -139,7 +139,7 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-1 overflow-x-auto pb-2">
+          <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-2">
             {visibleDates.map((date, index) => {
               const isAvailable = isDateAvailable(date);
               const isSelected = selectedDate && isSameDay(selectedDate, date);
@@ -152,17 +152,17 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                   disabled={!isAvailable}
                   onClick={() => handleDateSelect(date)}
                   className={cn(
-                    "flex flex-col items-center min-w-[60px] h-12 p-1 text-xs",
+                    "flex flex-col items-center flex-shrink-0 w-[58px] h-12 p-1 text-xs overflow-hidden",
                     !isAvailable && "opacity-30"
                   )}
                 >
-                  <div className="text-[10px] font-medium leading-none">
+                  <div className="text-[9px] font-medium leading-none truncate w-full text-center">
                     {format(date, 'EEE')}
                   </div>
-                  <div className="text-sm font-bold leading-none mt-0.5">
+                  <div className="text-sm font-bold leading-none mt-0.5 truncate w-full text-center">
                     {format(date, 'd')}
                   </div>
-                  <div className="text-[10px] leading-none mt-0.5">
+                  <div className="text-[9px] leading-none mt-0.5 truncate w-full text-center">
                     {format(date, 'MMM')}
                   </div>
                 </Button>
@@ -176,9 +176,9 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
       {selectedDate && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Clock className="w-4 h-4 text-primary" />
-              Times - {format(selectedDate, 'EEE, MMM d')}
+            <CardTitle className="flex items-center gap-2 text-sm truncate">
+              <Clock className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="truncate">Times - {format(selectedDate, 'EEE, MMM d')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -191,7 +191,7 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                 No available times for this date. Please select another date.
               </div>
             ) : (
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
                 {availableSlots.map((slot) => {
                   const isSelected = selectedTimeSlot?.id === slot.id;
                   const isLowAvailability = slot.available_spots <= 3;
@@ -202,21 +202,21 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                       variant={isSelected ? "default" : "outline"}
                       onClick={() => handleTimeSlotSelect(slot)}
                       className={cn(
-                        "flex flex-col items-center justify-center h-14 p-2 text-xs",
+                        "flex flex-col items-center justify-center h-14 p-1.5 text-xs overflow-hidden",
                         isSelected && "ring-2 ring-primary/20"
                       )}
                     >
-                      <div className="flex items-center gap-1 mb-1">
-                        <Clock className="w-3 h-3" />
-                        <span className="font-medium text-xs leading-none">
+                      <div className="flex items-center gap-0.5 mb-1 min-w-0">
+                        <Clock className="w-3 h-3 flex-shrink-0" />
+                        <span className="font-medium text-[11px] leading-none truncate">
                           {format(new Date(`2000-01-01T${slot.start_time}`), 'HH:mm')}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="w-3 h-3" />
+                      <div className="flex items-center gap-0.5 min-w-0">
+                        <Users className="w-3 h-3 flex-shrink-0" />
                         <Badge 
                           variant={isLowAvailability ? "destructive" : "secondary"}
-                          className="text-[10px] px-1 py-0 leading-none"
+                          className="text-[9px] px-1 py-0 leading-none min-w-0 truncate"
                         >
                           {slot.available_spots}
                         </Badge>
