@@ -41,8 +41,8 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
   const handleGuestContinue = async () => {
     if (!guestData.name || !guestData.email) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in your name and email to continue",
+        title: "Manglende informasjon",
+        description: "Vennligst fyll ut navn og e-post for å fortsette",
         variant: "destructive"
       });
       return;
@@ -54,13 +54,13 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
       setShowAuth(false);
       
       toast({
-        title: "Information Saved!",
-        description: "You can now proceed with payment"
+        title: "Informasjon lagret!",
+        description: "Du kan nå fortsette med betaling"
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Feil",
+        description: "Noe gikk galt. Vennligst prøv igjen.",
         variant: "destructive"
       });
     } finally {
@@ -71,8 +71,8 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
   const handleLogin = async () => {
     if (!loginData.email || !loginData.password) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in both email and password",
+        title: "Manglende informasjon",
+        description: "Vennligst fyll ut både e-post og passord",
         variant: "destructive"
       });
       return;
@@ -84,13 +84,13 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
       setShowAuth(false);
       
       toast({
-        title: "Welcome back!",
-        description: "You're now logged in"
+        title: "Velkommen tilbake!",
+        description: "Du er nå logget inn"
       });
     } catch (error) {
       toast({
-        title: "Login Failed",
-        description: "Please check your credentials and try again.",
+        title: "Innlogging feilet",
+        description: "Vennligst sjekk dine innloggingsopplysninger og prøv igjen.",
         variant: "destructive"
       });
     } finally {
@@ -135,8 +135,8 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
         }, userType, userData);
         
         toast({
-          title: "Payment Successful!",
-          description: "Your booking has been confirmed."
+          title: "Betaling vellykket!",
+          description: "Din bestilling er bekreftet."
         });
       } else {
         throw new Error(bookingResult.error || 'Booking failed');
@@ -144,8 +144,8 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
     } catch (error) {
       console.error('Payment/booking error:', error);
       toast({
-        title: "Payment Failed",
-        description: error instanceof Error ? error.message : "There was an issue processing your payment. Please try again.",
+        title: "Betaling feilet",
+        description: error instanceof Error ? error.message : "Det oppstod et problem med betalingen. Vennligst prøv igjen.",
         variant: "destructive"
       });
     } finally {
@@ -162,43 +162,43 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">Almost There!</CardTitle>
+            <CardTitle className="text-center">Nesten ferdig!</CardTitle>
             <p className="text-center text-muted-foreground">
-              We need a bit of information to complete your booking
+              Vi trenger litt informasjon for å fullføre bestillingen din
             </p>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="guest" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="guest">Continue as Guest</TabsTrigger>
-                <TabsTrigger value="login">Login / Register</TabsTrigger>
+                <TabsTrigger value="guest">Fortsett som gjest</TabsTrigger>
+                <TabsTrigger value="login">Logg inn / Registrer</TabsTrigger>
               </TabsList>
               
               <TabsContent value="guest" className="space-y-4 mt-4">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="guest-name">Full Name *</Label>
+                    <Label htmlFor="guest-name">Fullt navn *</Label>
                     <Input
                       id="guest-name"
-                      placeholder="Enter your full name"
+                      placeholder="Skriv inn ditt fulle navn"
                       value={guestData.name}
                       onChange={(e) => setGuestData({...guestData, name: e.target.value})}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="guest-email">Email Address *</Label>
+                    <Label htmlFor="guest-email">E-postadresse *</Label>
                     <Input
                       id="guest-email"
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder="din@epost.no"
                       value={guestData.email}
                       onChange={(e) => setGuestData({...guestData, email: e.target.value})}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="guest-phone">Phone Number (Optional)</Label>
+                    <Label htmlFor="guest-phone">Telefonnummer (Valgfritt)</Label>
                     <Input
                       id="guest-phone"
                       type="tel"
@@ -214,7 +214,7 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
                     className="w-full"
                     size="lg"
                   >
-                    {authLoading ? "Setting up..." : "Continue to Payment"}
+                    {authLoading ? "Setter opp..." : "Fortsett til betaling"}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
@@ -223,22 +223,22 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
               <TabsContent value="login" className="space-y-4 mt-4">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email Address</Label>
+                    <Label htmlFor="login-email">E-postadresse</Label>
                     <Input
                       id="login-email"
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder="din@epost.no"
                       value={loginData.email}
                       onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
+                    <Label htmlFor="login-password">Passord</Label>
                     <Input
                       id="login-password"
                       type="password"
-                      placeholder="Enter your password"
+                      placeholder="Skriv inn ditt passord"
                       value={loginData.password}
                       onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                     />
@@ -250,12 +250,12 @@ export const PaymentStep = ({ route, bookingData, onPaymentComplete }: PaymentSt
                     className="w-full"
                     size="lg"
                   >
-                    {authLoading ? "Logging in..." : "Login & Continue"}
+                    {authLoading ? "Logger inn..." : "Logg inn og fortsett"}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                   
                   <p className="text-sm text-muted-foreground text-center">
-                    Don't have an account? Registration coming soon!
+                    Har du ikke en konto? Registrering kommer snart!
                   </p>
                 </div>
               </TabsContent>

@@ -94,15 +94,15 @@ export const RouteCard = ({
 
         {/* Duration and Spots */}
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>{duration}</span>
+          <span className="text-sm font-medium">{duration}</span>
           <span>•</span>
-          <span>{availableSpots} spots left</span>
+          <span>{availableSpots} plasser igjen</span>
         </div>
 
         {/* Restaurants */}
         <div className="text-sm text-gray-600">
           {restaurants.slice(0, 2).map(r => r.name).join(', ')}
-          {restaurants.length > 2 && ` +${restaurants.length - 2} more`}
+          {restaurants.length > 2 && ` +${restaurants.length - 2} flere`}
         </div>
 
         {/* Book Button */}
@@ -114,7 +114,7 @@ export const RouteCard = ({
             }}
             className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3"
           >
-            Reserve
+            Reserver
           </Button>
         </div>
       </div>

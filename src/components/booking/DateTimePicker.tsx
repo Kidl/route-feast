@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addDays, startOfToday, isSameDay } from "date-fns";
+import { nb } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -110,8 +111,8 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
       <div>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-medium text-gray-900">Choose dates</h2>
-            <p className="text-sm text-gray-600 mt-1">Select your preferred date</p>
+            <h2 className="text-xl font-medium text-gray-900">Velg datoer</h2>
+            <p className="text-sm text-gray-600 mt-1">Velg din foretrukne dato</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -166,20 +167,20 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
       {selectedDate && (
         <div>
           <div className="mb-6">
-            <h2 className="text-xl font-medium text-gray-900">Choose time</h2>
+            <h2 className="text-xl font-medium text-gray-900">Velg tidspunkt</h2>
             <p className="text-sm text-gray-600 mt-1">
-              Available times for {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+              Tilgjengelige tidspunkt for {format(selectedDate, 'EEEE, MMMM d, yyyy', { locale: nb })}
             </p>
           </div>
           
           {loading ? (
             <div className="text-center py-12 text-gray-500">
-              <div className="text-base">Loading available times...</div>
+              <div className="text-base">Laster tilgjengelige tidspunkt...</div>
             </div>
           ) : availableSlots.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
-              <div className="text-base mb-2">No times available</div>
-              <div className="text-sm">Please select another date</div>
+              <div className="text-base mb-2">Ingen tidspunkt tilgjengelig</div>
+              <div className="text-sm">Vennligst velg en annen dato</div>
             </div>
           ) : (
             <div className="space-y-3">
@@ -210,7 +211,7 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                           "text-sm",
                           isSelected ? "text-white/80" : "text-gray-600"
                         )}>
-                          {slot.available_spots} left
+                          {slot.available_spots} igjen
                         </span>
                         {isLowAvailability && (
                           <div className={cn(
