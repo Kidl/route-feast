@@ -14,7 +14,253 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      booking_participants: {
+        Row: {
+          allergies: string | null
+          booking_id: string | null
+          created_at: string
+          dietary_preferences: string[] | null
+          id: string
+          name: string | null
+        }
+        Insert: {
+          allergies?: string | null
+          booking_id?: string | null
+          created_at?: string
+          dietary_preferences?: string[] | null
+          id?: string
+          name?: string | null
+        }
+        Update: {
+          allergies?: string | null
+          booking_id?: string | null
+          created_at?: string
+          dietary_preferences?: string[] | null
+          id?: string
+          name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_participants_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          allergies: string | null
+          booking_reference: string
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          confirmation_sent_at: string | null
+          created_at: string
+          dietary_preferences: string[] | null
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          id: string
+          number_of_people: number
+          payment_status: string
+          route_id: string | null
+          schedule_id: string | null
+          special_requests: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          total_amount_nok: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          allergies?: string | null
+          booking_reference?: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          confirmation_sent_at?: string | null
+          created_at?: string
+          dietary_preferences?: string[] | null
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          id?: string
+          number_of_people: number
+          payment_status?: string
+          route_id?: string | null
+          schedule_id?: string | null
+          special_requests?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          total_amount_nok: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          allergies?: string | null
+          booking_reference?: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          confirmation_sent_at?: string | null
+          created_at?: string
+          dietary_preferences?: string[] | null
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          id?: string
+          number_of_people?: number
+          payment_status?: string
+          route_id?: string | null
+          schedule_id?: string | null
+          special_requests?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          total_amount_nok?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "route_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          preferred_language: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          preferred_language?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          preferred_language?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      route_schedules: {
+        Row: {
+          available_date: string
+          available_spots: number
+          created_at: string
+          id: string
+          is_active: boolean | null
+          route_id: string | null
+          start_time: string
+        }
+        Insert: {
+          available_date: string
+          available_spots: number
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          route_id?: string | null
+          start_time: string
+        }
+        Update: {
+          available_date?: string
+          available_spots?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          route_id?: string | null
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "route_schedules_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routes: {
+        Row: {
+          created_at: string
+          description: string
+          duration_hours: number
+          highlights: string[] | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          location: string
+          max_capacity: number
+          name: string
+          price_nok: number
+          restaurants: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          duration_hours: number
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          location: string
+          max_capacity?: number
+          name: string
+          price_nok: number
+          restaurants?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          duration_hours?: number
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          location?: string
+          max_capacity?: number
+          name?: string
+          price_nok?: number
+          restaurants?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
