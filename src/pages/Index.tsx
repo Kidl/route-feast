@@ -42,15 +42,15 @@ const Index = () => {
                   id={route.id}
                   name={route.name}
                   description={route.description}
-                  image={route.image_url}
+                  image={route.image_url || ''}
                   price={Math.round(route.price_nok / 100)} // Convert from øre to NOK
                   duration={`${route.duration_hours} hours`}
                   maxCapacity={route.max_capacity}
                   currentBookings={Math.floor(route.max_capacity * 0.6)} // Simulate bookings
                   rating={4.8}
-                  restaurants={route.restaurants}
+                  restaurants={route.restaurants || []}
                   location={route.location}
-                  highlights={route.highlights}
+                  highlights={route.highlights || []}
                 />
               ))
             )}

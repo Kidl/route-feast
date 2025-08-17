@@ -146,7 +146,18 @@ export const RouteCard = ({
       
       <BookingDialog 
         route={{
-          id, name, description, image, price, duration, maxCapacity, currentBookings, rating, restaurants, location, highlights
+          id: id,
+          name: name,
+          description: description,
+          image: image,
+          price: price,
+          duration: duration,
+          maxCapacity: maxCapacity,
+          currentBookings: currentBookings,
+          rating: rating,
+          restaurants: restaurants,
+          location: location,
+          highlights: highlights
         }}
         open={bookingOpen}
         onOpenChange={setBookingOpen}
