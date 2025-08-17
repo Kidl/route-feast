@@ -35,6 +35,8 @@ interface RestaurantData {
   email?: string;
   website?: string;
   status: string;
+  cuisine_type?: string;
+  tags?: string[];
   created_at: string;
   restaurant_images: { id: string; url: string; is_cover: boolean }[];
 }
@@ -44,8 +46,12 @@ export function AdminRestaurants() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [cuisineFilter, setCuisineFilter] = useState<string>("all");
+  const [tagFilter, setTagFilter] = useState<string>("all");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRestaurant, setEditingRestaurant] = useState<RestaurantData | null>(null);
+  const [availableCuisines, setAvailableCuisines] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -65,6 +71,12 @@ export function AdminRestaurants() {
 
       if (error) throw error;
       setRestaurants(data || []);
+      
+      // Extract unique cuisine types and tags for filtering
+      const cuisines = [...new Set(data?.map(r => r.cuisine_type).filter(Boolean) || [])];
+      const allTags = [...new Set(data?.flatMap(r => r.tags || []) || [])];
+      setAvailableCuisines(cuisines);
+      setAvailableTags(allTags);
     } catch (error) {
       console.error("Error loading restaurants:", error);
       toast({
@@ -80,11 +92,15 @@ export function AdminRestaurants() {
   const filteredRestaurants = restaurants.filter((restaurant) => {
     const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      restaurant.city?.toLowerCase().includes(searchTerm.toLowerCase());
+      restaurant.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      restaurant.cuisine_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      restaurant.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatus = statusFilter === "all" || restaurant.status === statusFilter;
+    const matchesCuisine = cuisineFilter === "all" || restaurant.cuisine_type === cuisineFilter;
+    const matchesTag = tagFilter === "all" || restaurant.tags?.includes(tagFilter);
     
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesCuisine && matchesTag;
   });
 
   const handleToggleStatus = async (restaurantId: string, currentStatus: string) => {
@@ -148,7 +164,7 @@ export function AdminRestaurants() {
             <CardTitle className="text-base">Filtre</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-wrap">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -177,6 +193,42 @@ export function AdminRestaurants() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Filter className="h-4 w-4" />
+                    Kjøkken: {cuisineFilter === "all" ? "Alle" : cuisineFilter}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setCuisineFilter("all")}>
+                    Alle kjøkken
+                  </DropdownMenuItem>
+                  {availableCuisines.map(cuisine => (
+                    <DropdownMenuItem key={cuisine} onClick={() => setCuisineFilter(cuisine)}>
+                      {cuisine}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Filter className="h-4 w-4" />
+                    Tag: {tagFilter === "all" ? "Alle" : tagFilter}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setTagFilter("all")}>
+                    Alle tags
+                  </DropdownMenuItem>
+                  {availableTags.map(tag => (
+                    <DropdownMenuItem key={tag} onClick={() => setTagFilter(tag)}>
+                      {tag}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </CardContent>
         </Card>
@@ -190,6 +242,7 @@ export function AdminRestaurants() {
                   <TableRow>
                     <TableHead className="w-[60px]"></TableHead>
                     <TableHead>Restaurant</TableHead>
+                    <TableHead>Kjøkken & Tags</TableHead>
                     <TableHead>Adresse</TableHead>
                     <TableHead>Koordinater</TableHead>
                     <TableHead>Bilder</TableHead>
@@ -201,7 +254,7 @@ export function AdminRestaurants() {
                   {loading ? (
                     [...Array(5)].map((_, i) => (
                       <TableRow key={i}>
-                        {[...Array(7)].map((_, j) => (
+                        {[...Array(8)].map((_, j) => (
                           <TableCell key={j}>
                             <div className="h-4 bg-muted rounded animate-pulse"></div>
                           </TableCell>
@@ -210,7 +263,7 @@ export function AdminRestaurants() {
                     ))
                   ) : filteredRestaurants.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                         Ingen restauranter funnet
                       </TableCell>
                     </TableRow>
@@ -236,6 +289,29 @@ export function AdminRestaurants() {
                             <div className="text-xs text-muted-foreground line-clamp-1">
                               {restaurant.description}
                             </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            {restaurant.cuisine_type && (
+                              <Badge variant="outline" className="text-xs">
+                                {restaurant.cuisine_type}
+                              </Badge>
+                            )}
+                            {restaurant.tags && restaurant.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {restaurant.tags.slice(0, 2).map(tag => (
+                                  <Badge key={tag} variant="secondary" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                                {restaurant.tags.length > 2 && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    +{restaurant.tags.length - 2}
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>

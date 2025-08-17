@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { X, Upload, Plus, MapPin } from "lucide-react";
+import { X, Upload, Plus, MapPin, ChefHat, Tag } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,6 +30,8 @@ const restaurantSchema = z.object({
   lat: z.number().optional(),
   lng: z.number().optional(),
   status: z.enum(["active", "inactive"]).default("active"),
+  cuisine_type: z.string().optional(),
+  tags: z.string().optional(),
 });
 
 type RestaurantFormData = z.infer<typeof restaurantSchema>;
@@ -46,6 +49,16 @@ export function RestaurantFormDrawer({ open, onOpenChange, restaurant, onSave }:
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<any[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [tagInput, setTagInput] = useState("");
+  const [availableCuisines] = useState([
+    "Asian", "Italian", "Nordic", "French", "American", "Mexican", "Indian", "Mediterranean", 
+    "Japanese", "Chinese", "Thai", "Vietnamese", "Korean", "Middle Eastern", "Seafood", "International"
+  ]);
+  const [availableTags] = useState([
+    "fine-dining", "casual", "upscale", "cozy", "modern", "traditional", "family-friendly", "romantic",
+    "outdoor-seating", "vegan-friendly", "gluten-free", "organic", "farm-to-table", "wine-bar",
+    "cocktails", "breakfast", "brunch", "lunch", "dinner", "late-night", "takeaway", "delivery"
+  ]);
   const { toast } = useToast();
 
   const form = useForm<RestaurantFormData>({
@@ -62,6 +75,8 @@ export function RestaurantFormDrawer({ open, onOpenChange, restaurant, onSave }:
       lat: undefined,
       lng: undefined,
       status: "active",
+      cuisine_type: "",
+      tags: "",
     },
   });
 
@@ -79,8 +94,11 @@ export function RestaurantFormDrawer({ open, onOpenChange, restaurant, onSave }:
         lat: restaurant.lat,
         lng: restaurant.lng,
         status: restaurant.status,
+        cuisine_type: restaurant.cuisine_type || "",
+        tags: restaurant.tags ? restaurant.tags.join(", ") : "",
       });
       setExistingImages(restaurant.restaurant_images || []);
+      setTagInput(restaurant.tags ? restaurant.tags.join(", ") : "");
     } else {
       form.reset({
         name: "",
@@ -94,8 +112,11 @@ export function RestaurantFormDrawer({ open, onOpenChange, restaurant, onSave }:
         lat: undefined,
         lng: undefined,
         status: "active",
+        cuisine_type: "",
+        tags: "",
       });
       setExistingImages([]);
+      setTagInput("");
     }
     setImageFiles([]);
     setImagePreviews([]);
@@ -210,6 +231,12 @@ export function RestaurantFormDrawer({ open, onOpenChange, restaurant, onSave }:
         uploadedImageUrls = await handleImageUpload(imageFiles);
       }
 
+      // Parse tags from comma-separated string
+      const tags = tagInput
+        .split(",")
+        .map(tag => tag.trim())
+        .filter(tag => tag.length > 0);
+
       const restaurantData = {
         name: data.name,
         description: data.description || null,
@@ -222,6 +249,8 @@ export function RestaurantFormDrawer({ open, onOpenChange, restaurant, onSave }:
         lat: data.lat || null,
         lng: data.lng || null,
         status: data.status,
+        cuisine_type: data.cuisine_type || null,
+        tags: tags.length > 0 ? tags : null,
       };
 
       let restaurantId: string;
@@ -331,6 +360,66 @@ export function RestaurantFormDrawer({ open, onOpenChange, restaurant, onSave }:
                 placeholder="Beskriv restauranten..."
                 rows={3}
               />
+            </div>
+
+            {/* Cuisine Type and Tags */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cuisine_type" className="flex items-center gap-2">
+                  <ChefHat className="h-4 w-4" />
+                  Kjøkkentype
+                </Label>
+                <Select
+                  value={form.watch("cuisine_type") || ""}
+                  onValueChange={(value) => form.setValue("cuisine_type", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Velg kjøkkentype..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCuisines.map(cuisine => (
+                      <SelectItem key={cuisine} value={cuisine}>
+                        {cuisine}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tags" className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  Tags
+                </Label>
+                <Input
+                  id="tags"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  placeholder="Skriv tags adskilt med komma..."
+                />
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {availableTags.slice(0, 8).map(tag => (
+                    <Button
+                      key={tag}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-6 text-xs"
+                      onClick={() => {
+                        const currentTags = tagInput.split(",").map(t => t.trim()).filter(t => t);
+                        if (!currentTags.includes(tag)) {
+                          setTagInput(currentTags.length > 0 ? `${tagInput}, ${tag}` : tag);
+                        }
+                      }}
+                    >
+                      {tag}
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Klikk på foreslåtte tags eller skriv egne adskilt med komma
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

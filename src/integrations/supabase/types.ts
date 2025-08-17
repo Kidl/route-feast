@@ -496,6 +496,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          cuisine_type: string | null
           description: string | null
           email: string | null
           id: string
@@ -505,6 +506,7 @@ export type Database = {
           opening_hours: Json | null
           phone: string | null
           status: string
+          tags: string[] | null
           updated_at: string
           website: string | null
         }
@@ -513,6 +515,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          cuisine_type?: string | null
           description?: string | null
           email?: string | null
           id?: string
@@ -522,6 +525,7 @@ export type Database = {
           opening_hours?: Json | null
           phone?: string | null
           status?: string
+          tags?: string[] | null
           updated_at?: string
           website?: string | null
         }
@@ -530,6 +534,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          cuisine_type?: string | null
           description?: string | null
           email?: string | null
           id?: string
@@ -539,6 +544,7 @@ export type Database = {
           opening_hours?: Json | null
           phone?: string | null
           status?: string
+          tags?: string[] | null
           updated_at?: string
           website?: string | null
         }
