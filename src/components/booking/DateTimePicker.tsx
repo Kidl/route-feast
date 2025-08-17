@@ -105,34 +105,33 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
   const canNavigateRight = dateOffset < 30; // Limit to 30 days ahead
 
   return (
-    <div className="space-y-6">
-      {/* Date Selection - Airbnb Style */}
+    <div className="space-y-8">
+      {/* Date Selection */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Select dates</h3>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-medium text-gray-900">Choose dates</h2>
+            <p className="text-sm text-gray-600 mt-1">Select your preferred date</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
               onClick={() => setDateOffset(Math.max(0, dateOffset - 7))}
               disabled={!canNavigateLeft}
-              className="h-8 w-8 p-0 rounded-full hover:bg-muted"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-30"
             >
               <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
+            </button>
+            <button
               onClick={() => setDateOffset(dateOffset + 7)}
               disabled={!canNavigateRight}
-              className="h-8 w-8 p-0 rounded-full hover:bg-muted"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-30"
             >
               <ChevronRight className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
         </div>
         
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+        <div className="grid grid-cols-7 gap-2">
           {visibleDates.map((date, index) => {
             const isAvailable = isDateAvailable(date);
             const isSelected = selectedDate && isSameDay(selectedDate, date);
@@ -143,18 +142,18 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                 disabled={!isAvailable}
                 onClick={() => handleDateSelect(date)}
                 className={cn(
-                  "flex flex-col items-center justify-center min-w-[48px] h-[48px] p-2 rounded-xl border transition-all duration-200 flex-shrink-0",
+                  "flex flex-col items-center justify-center h-16 border transition-all text-center",
                   isSelected 
-                    ? "bg-foreground text-background border-foreground" 
+                    ? "bg-gray-900 text-white border-gray-900" 
                     : isAvailable 
-                      ? "bg-background text-foreground border-border hover:border-foreground/40" 
-                      : "bg-muted/30 text-muted-foreground border-border cursor-not-allowed opacity-50"
+                      ? "bg-white text-gray-900 border-gray-300 hover:border-gray-900" 
+                      : "bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed"
                 )}
               >
-                <div className="text-[10px] font-medium leading-none">
-                  {format(date, 'EEE').toUpperCase()}
+                <div className="text-xs font-medium uppercase tracking-wide">
+                  {format(date, 'EEE')}
                 </div>
-                <div className="text-sm font-semibold leading-none mt-1">
+                <div className="text-lg font-semibold mt-1">
                   {format(date, 'd')}
                 </div>
               </button>
@@ -163,21 +162,24 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
         </div>
       </div>
 
-      {/* Time Selection - Airbnb Style */}
+      {/* Time Selection */}
       {selectedDate && (
         <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">
-            Select time for {format(selectedDate, 'EEEE, MMMM d')}
-          </h3>
+          <div className="mb-6">
+            <h2 className="text-xl font-medium text-gray-900">Choose time</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Available times for {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+            </p>
+          </div>
           
           {loading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Loading available times...
+            <div className="text-center py-12 text-gray-500">
+              <div className="text-base">Loading available times...</div>
             </div>
           ) : availableSlots.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No available times for this date.</p>
-              <p className="text-sm mt-1">Please select another date.</p>
+            <div className="text-center py-12 text-gray-500">
+              <div className="text-base mb-2">No times available</div>
+              <div className="text-sm">Please select another date</div>
             </div>
           ) : (
             <div className="space-y-3">
@@ -190,30 +192,31 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                     key={slot.id}
                     onClick={() => handleTimeSlotSelect(slot)}
                     className={cn(
-                      "w-full p-4 rounded-xl border transition-all duration-200 text-left",
+                      "w-full p-4 border transition-all text-left group",
                       isSelected 
-                        ? "bg-foreground text-background border-foreground" 
-                        : "bg-background text-foreground border-border hover:border-foreground/40"
+                        ? "bg-gray-900 text-white border-gray-900" 
+                        : "bg-white text-gray-900 border-gray-300 hover:border-gray-900"
                     )}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          <span className="font-medium">
-                            {format(new Date(`2000-01-01T${slot.start_time}`), 'h:mm a')}
-                          </span>
-                        </div>
+                        <Clock className="w-5 h-5" />
+                        <span className="text-base font-medium">
+                          {format(new Date(`2000-01-01T${slot.start_time}`), 'h:mm a')}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <span className={cn(
                           "text-sm",
-                          isSelected ? "text-background/80" : "text-muted-foreground"
+                          isSelected ? "text-white/80" : "text-gray-600"
                         )}>
-                          {slot.available_spots} {slot.available_spots === 1 ? 'spot' : 'spots'} left
+                          {slot.available_spots} left
                         </span>
-                        {isLowAvailability && !isSelected && (
-                          <div className="w-2 h-2 bg-destructive rounded-full"></div>
+                        {isLowAvailability && (
+                          <div className={cn(
+                            "w-2 h-2 rounded-full",
+                            isSelected ? "bg-white" : "bg-red-500"
+                          )}></div>
                         )}
                       </div>
                     </div>
