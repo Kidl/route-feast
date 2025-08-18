@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { format, startOfDay, isSameDay } from "date-fns";
+import { format, startOfDay, isSameDay, getWeek, startOfWeek, endOfWeek, eachDayOfInterval } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Calendar as CalendarIcon, Plus, Filter, Search, Users, Clock, MapPin, Phone, Mail } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Filter, Search, Users, Clock, MapPin, Phone, Mail, ChevronDown, ChevronUp, UtensilsCrossed, Calendar as CalendarDayIcon } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
@@ -79,6 +80,7 @@ export function AdminBookings() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showTableDialog, setShowTableDialog] = useState(false);
+  const [collapsedDates, setCollapsedDates] = useState<Set<string>>(new Set());
 
   const form = useForm({
     defaultValues: {
@@ -99,6 +101,9 @@ export function AdminBookings() {
 
   const fetchBookings = async () => {
     try {
+      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
+      
       const { data, error } = await supabase
         .from('bookings')
         .select(`
@@ -107,7 +112,8 @@ export function AdminBookings() {
           schedule:route_schedules(available_date, start_time),
           table:restaurant_tables(table_number, capacity)
         `)
-        .gte('created_at', format(startOfDay(selectedDate), 'yyyy-MM-dd'))
+        .gte('created_at', format(weekStart, 'yyyy-MM-dd'))
+        .lte('created_at', format(weekEnd, 'yyyy-MM-dd'))
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -240,90 +246,111 @@ export function AdminBookings() {
     
     const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
     
-    const matchesDate = isSameDay(new Date(booking.schedule?.available_date || booking.created_at), selectedDate);
-    
-    return matchesSearch && matchesStatus && matchesDate;
+    return matchesSearch && matchesStatus;
   });
 
-  const getBookingsByStatus = (status: string) => {
-    return filteredBookings.filter(booking => booking.status === status);
+  const getBookingsByDate = () => {
+    const bookingsByDate = new Map<string, Booking[]>();
+    
+    filteredBookings.forEach(booking => {
+      const bookingDate = booking.schedule?.available_date || booking.created_at.split('T')[0];
+      if (!bookingsByDate.has(bookingDate)) {
+        bookingsByDate.set(bookingDate, []);
+      }
+      bookingsByDate.get(bookingDate)!.push(booking);
+    });
+    
+    return Array.from(bookingsByDate.entries()).sort(([a], [b]) => a.localeCompare(b));
+  };
+
+  const getBookingType = (booking: Booking) => {
+    if (booking.route) {
+      return 'Gastro Route';
+    } else if (booking.schedule) {
+      return 'Bordreservasjon med forhåndsbestilling';
+    } else {
+      return 'Bordreservasjon';
+    }
+  };
+
+  const toggleDateCollapse = (date: string) => {
+    const newCollapsed = new Set(collapsedDates);
+    if (newCollapsed.has(date)) {
+      newCollapsed.delete(date);
+    } else {
+      newCollapsed.add(date);
+    }
+    setCollapsedDates(newCollapsed);
   };
 
   const BookingCard = ({ booking }: { booking: Booking }) => (
-    <Card className="mb-3 cursor-move hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <p className="font-medium text-sm">{booking.guest_name || booking.guest_email}</p>
-            <p className="text-xs text-muted-foreground">{booking.booking_reference}</p>
-          </div>
-          <Badge variant="outline" className="text-xs">
+    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <p className="font-medium text-sm truncate">{booking.guest_name || booking.guest_email}</p>
+          <Badge variant="outline" className="text-xs shrink-0">
             <Users className="w-3 h-3 mr-1" />
             {booking.number_of_people}
           </Badge>
+          <Badge variant="secondary" className="text-xs shrink-0">
+            {getBookingType(booking) === 'Gastro Route' && <UtensilsCrossed className="w-3 h-3 mr-1" />}
+            {getBookingType(booking) === 'Bordreservasjon med forhåndsbestilling' && <CalendarDayIcon className="w-3 h-3 mr-1" />}
+            {getBookingType(booking)}
+          </Badge>
         </div>
         
-        {booking.table && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
-            <MapPin className="w-3 h-3" />
-            Bord {booking.table.table_number}
-          </div>
-        )}
-        
-        {booking.schedule && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-            <Clock className="w-3 h-3" />
-            {booking.schedule.start_time}
-          </div>
-        )}
-        
-        <div className="flex gap-1 mt-2">
-          {booking.status === 'no_table' && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-xs h-6"
-              onClick={() => {
-                setSelectedBooking(booking);
-                setShowTableDialog(true);
-              }}
-            >
-              Tildel bord
-            </Button>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <span>{booking.booking_reference}</span>
+          {booking.table && (
+            <div className="flex items-center gap-1">
+              <MapPin className="w-3 h-3" />
+              Bord {booking.table.table_number}
+            </div>
           )}
-          
-          <Select onValueChange={(value) => updateBookingStatus(booking.id, value)}>
-            <SelectTrigger className="h-6 text-xs border-none p-1">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              {statusColumns.map(status => (
-                <SelectItem key={status.key} value={status.key}>
-                  {status.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {booking.schedule && (
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {booking.schedule.start_time}
+            </div>
+          )}
+          {booking.guest_phone && (
+            <div className="flex items-center gap-1">
+              <Phone className="w-3 h-3" />
+              {booking.guest_phone}
+            </div>
+          )}
         </div>
-        
-        {(booking.guest_phone || booking.guest_email) && (
-          <div className="mt-2 pt-2 border-t">
-            {booking.guest_phone && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Phone className="w-3 h-3" />
-                {booking.guest_phone}
-              </div>
-            )}
-            {booking.guest_email && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Mail className="w-3 h-3" />
-                {booking.guest_email}
-              </div>
-            )}
-          </div>
+      </div>
+      
+      <div className="flex items-center gap-2 ml-4">
+        {booking.status === 'no_table' && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs h-8"
+            onClick={() => {
+              setSelectedBooking(booking);
+              setShowTableDialog(true);
+            }}
+          >
+            Tildel bord
+          </Button>
         )}
-      </CardContent>
-    </Card>
+        
+        <Select value={booking.status} onValueChange={(value) => updateBookingStatus(booking.id, value)}>
+          <SelectTrigger className="w-32 h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {statusColumns.map(status => (
+              <SelectItem key={status.key} value={status.key}>
+                {status.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
   );
 
   return (
@@ -459,9 +486,9 @@ export function AdminBookings() {
             <div className="flex gap-4 items-center">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
+                  <Button variant="outline" className="w-[280px] justify-start text-left font-normal">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(selectedDate, "d. MMMM yyyy", { locale: nb })}
+                    {format(selectedDate, "d. MMMM yyyy", { locale: nb })} • Uke {getWeek(selectedDate)}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -501,34 +528,57 @@ export function AdminBookings() {
           </CardContent>
         </Card>
 
-        {/* Kanban Board */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 h-[calc(100vh-300px)]">
-          {statusColumns.map(column => {
-            const columnBookings = getBookingsByStatus(column.key);
+        {/* Bookings List Grouped by Date */}
+        <div className="space-y-4">
+          {getBookingsByDate().map(([date, dateBookings]) => {
+            const isCollapsed = collapsedDates.has(date);
+            const weekNumber = getWeek(new Date(date));
             
             return (
-              <div key={column.key} className={cn("rounded-lg border-2 border-dashed p-4", column.color)}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm">{column.title}</h3>
-                  <Badge variant="secondary" className="text-xs">
-                    {columnBookings.length}
-                  </Badge>
-                </div>
-                
-                <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
-                  {columnBookings.map(booking => (
-                    <BookingCard key={booking.id} booking={booking} />
-                  ))}
+              <Card key={date}>
+                <Collapsible open={!isCollapsed} onOpenChange={() => toggleDateCollapse(date)}>
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="pb-2 cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                          <CardTitle className="text-lg">
+                            {format(new Date(date), "EEEE d. MMMM yyyy", { locale: nb })}
+                          </CardTitle>
+                          <Badge variant="outline" className="text-xs">
+                            Uke {weekNumber}
+                          </Badge>
+                        </div>
+                        <Badge variant="secondary">
+                          {dateBookings.length} booking{dateBookings.length !== 1 ? 'er' : ''}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
                   
-                  {columnBookings.length === 0 && (
-                    <p className="text-muted-foreground text-xs text-center py-8">
-                      Ingen bookinger
-                    </p>
-                  )}
-                </div>
-              </div>
+                  <CollapsibleContent>
+                    <CardContent className="pt-0">
+                      <div className="space-y-2">
+                        {dateBookings.map(booking => (
+                          <BookingCard key={booking.id} booking={booking} />
+                        ))}
+                      </div>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Collapsible>
+              </Card>
             );
           })}
+          
+          {getBookingsByDate().length === 0 && (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <p className="text-muted-foreground">
+                  Ingen bookinger funnet for valgt periode
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Table Assignment Dialog */}
