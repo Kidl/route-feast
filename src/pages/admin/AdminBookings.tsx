@@ -103,11 +103,11 @@ export function AdminBookings() {
         .from('bookings')
         .select(`
           *,
-          route:routes!bookings_route_id_fkey(name, location),
-          schedule:route_schedules!bookings_schedule_id_fkey(available_date, start_time),
-          table:restaurant_tables!bookings_table_id_fkey(table_number, capacity)
+          route:routes(name, location),
+          schedule:route_schedules(available_date, start_time),
+          table:restaurant_tables(table_number, capacity)
         `)
-        .gte('schedule.available_date', format(startOfDay(selectedDate), 'yyyy-MM-dd'))
+        .gte('created_at', format(startOfDay(selectedDate), 'yyyy-MM-dd'))
         .order('created_at', { ascending: false });
 
       if (error) throw error;
