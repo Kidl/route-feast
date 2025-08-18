@@ -70,10 +70,14 @@ export const RestaurantGallery = ({ images, restaurantName }: RestaurantGalleryP
                 `}
               >
                 <img
-                  src={image.url}
+                  src={image.url || '/placeholder.svg'}
                   alt={image.alt_text || `${restaurantName} bilde ${index + 1}`}
                   className="w-full h-full object-cover"
                   loading={index === 0 ? "eager" : "lazy"}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/placeholder.svg';
+                  }}
                 />
                 {image.is_cover && (
                   <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
@@ -123,9 +127,13 @@ export const RestaurantGallery = ({ images, restaurantName }: RestaurantGalleryP
 
                 {/* Main Image */}
                 <img
-                  src={sortedImages[selectedImage]?.url}
+                  src={sortedImages[selectedImage]?.url || '/placeholder.svg'}
                   alt={sortedImages[selectedImage]?.alt_text || `${restaurantName} bilde ${selectedImage + 1}`}
                   className="max-w-full max-h-full object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/placeholder.svg';
+                  }}
                 />
 
                 {/* Image Counter */}

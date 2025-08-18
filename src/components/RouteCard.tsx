@@ -44,9 +44,13 @@ export const RouteCard = ({
       <div className="relative mb-3">
         <Link to={`/route/${id}`}>
           <img 
-            src={image} 
+            src={image || '/placeholder.svg'} 
             alt={name}
             className="w-full h-72 object-cover rounded-xl"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/placeholder.svg';
+            }}
           />
         </Link>
         

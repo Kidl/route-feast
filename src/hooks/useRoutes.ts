@@ -53,7 +53,7 @@ export const useRoutes = () => {
           ...route,
           restaurants: Array.isArray(route.restaurants) ? (route.restaurants as unknown) as Restaurant[] : [],
           highlights: Array.isArray(route.highlights) ? route.highlights : [],
-          image_url: route.image_url || ''
+          image_url: route.image_url || '/placeholder.svg'
         }));
         
         // Sort by price
