@@ -132,6 +132,7 @@ export type Database = {
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
+          table_id: string | null
           total_amount_nok: number
           updated_at: string
           user_id: string | null
@@ -156,6 +157,7 @@ export type Database = {
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          table_id?: string | null
           total_amount_nok: number
           updated_at?: string
           user_id?: string | null
@@ -180,6 +182,7 @@ export type Database = {
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          table_id?: string | null
           total_amount_nok?: number
           updated_at?: string
           user_id?: string | null
@@ -197,6 +200,13 @@ export type Database = {
             columns: ["schedule_id"]
             isOneToOne: false
             referencedRelation: "route_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "restaurant_tables"
             referencedColumns: ["id"]
           },
         ]
@@ -489,6 +499,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      restaurant_tables: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+          location_notes: string | null
+          restaurant_id: string
+          status: string
+          table_number: string
+          table_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          location_notes?: string | null
+          restaurant_id: string
+          status?: string
+          table_number: string
+          table_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          location_notes?: string | null
+          restaurant_id?: string
+          status?: string
+          table_number?: string
+          table_type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       restaurants: {
         Row: {
