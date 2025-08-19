@@ -139,6 +139,34 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
       return;
     }
 
+    // Check for consecutive restaurant validation
+    if (editingStopIndex < 0) {
+      // Adding new stop - check if last stop is same restaurant
+      const lastStop = value[value.length - 1];
+      if (lastStop && lastStop.restaurant_id === selectedRestaurant.id) {
+        toast({
+          title: "Feil",
+          description: "Samme restaurant kan ikke være påfølgende stopp. Velg en annen restaurant.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      // Editing existing stop - check adjacent stops
+      const prevStop = value[editingStopIndex - 1];
+      const nextStop = value[editingStopIndex + 1];
+      
+      if ((prevStop && prevStop.restaurant_id === selectedRestaurant.id) ||
+          (nextStop && nextStop.restaurant_id === selectedRestaurant.id)) {
+        toast({
+          title: "Feil",
+          description: "Samme restaurant kan ikke være påfølgende stopp. Velg en annen restaurant.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     const selectedDishObjects = restaurantDishes.filter(d => selectedDishes.includes(d.id));
     
     if (editingStopIndex >= 0) {
