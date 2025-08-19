@@ -330,19 +330,29 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
               />
             </div>
 
-            <Separator className="my-4" />
+            <Separator className="my-6" />
 
-            <div className="space-y-2">
-              <Label className="text-base font-semibold">Rutestopp - Restaurant & Meny</Label>
-              <p className="text-xs text-muted-foreground">
-                Velg restauranter og retter for ruten. Rekkefølgen definerer rutens gang.
+            {/* ROUTE BUILDER SECTION - CRITICAL */}
+            <div className="space-y-4 border-2 border-primary/20 rounded-lg p-6 bg-primary/5">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-primary rounded-full"></div>
+                <Label className="text-lg font-bold text-primary">RUTESTOPP - RESTAURANT & MENY</Label>
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">
+                🏪 Velg restauranter og retter for ruten. Rekkefølgen definerer rutens gang.
               </p>
-              <div className="border rounded-lg p-4 bg-muted/20">
-                <RouteBuilder value={routeStops} onChange={setRouteStops} />
+              <div className="min-h-[200px] bg-background rounded-lg border border-border p-4">
+                <RouteBuilder 
+                  value={routeStops} 
+                  onChange={(stops) => {
+                    console.log("🔄 RouteBuilder onChange called with:", stops.length, "stops");
+                    setRouteStops(stops);
+                  }} 
+                />
               </div>
             </div>
 
-            <Separator className="my-4" />
+            <Separator className="my-6" />
 
             <div className="space-y-2">
               <Label>Høydepunkter</Label>

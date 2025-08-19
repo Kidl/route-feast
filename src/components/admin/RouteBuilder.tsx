@@ -165,6 +165,10 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
 
   return (
     <div className="space-y-6">
+      {/* Debug info */}
+      <div className="text-xs text-muted-foreground bg-yellow-50 p-2 rounded">
+        🔧 Debug: {restaurants.length} restaurants loaded, {value.length} current stops
+      </div>
       {/* Route Summary */}
       {value.length > 0 && (
         <Card>
