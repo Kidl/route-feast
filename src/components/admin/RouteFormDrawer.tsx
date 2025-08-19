@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
@@ -329,13 +329,19 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
               />
             </div>
 
+            <Separator className="my-4" />
+
             <div className="space-y-2">
-              <Label>Rutestopp</Label>
+              <Label className="text-base font-semibold">Rutestopp - Restaurant & Meny</Label>
               <p className="text-xs text-muted-foreground">
                 Velg restauranter og retter for ruten. Rekkefølgen definerer rutens gang.
               </p>
-              <RouteBuilder value={routeStops} onChange={setRouteStops} />
+              <div className="border rounded-lg p-4 bg-muted/20">
+                <RouteBuilder value={routeStops} onChange={setRouteStops} />
+              </div>
             </div>
+
+            <Separator className="my-4" />
 
             <div className="space-y-2">
               <Label>Høydepunkter</Label>
