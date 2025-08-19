@@ -117,16 +117,26 @@ export const RouteCard = ({
         </div>
 
         {/* Book Button */}
-        <div className="pt-2">
+        <div className="pt-2 space-y-2">
           <Button
             onClick={(e) => {
               e.preventDefault();
               setBookingOpen(true);
             }}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3"
+            variant="secondary"
+            className="w-full font-medium py-3"
           >
-            Reserver
+            Reserver nå
           </Button>
+          
+          <div className="text-center">
+            <Link 
+              to={`/route/${id}`}
+              className="text-sm text-primary hover:text-primary-dark transition-colors underline"
+            >
+              Les mer informasjon
+            </Link>
+          </div>
         </div>
       </div>
 
