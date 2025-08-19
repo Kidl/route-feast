@@ -282,6 +282,7 @@ const RouteDetail = () => {
 
                 <Button 
                   onClick={() => setBookingOpen(true)}
+                  variant="secondary"
                   size="lg" 
                   className="w-full"
                 >
