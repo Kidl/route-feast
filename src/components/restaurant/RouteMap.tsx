@@ -20,28 +20,83 @@ interface RouteMapProps {
   stops?: RouteStop[];
 }
 
-// Stavanger restaurant coordinates (mock data for demo)
-const stavangerRestaurants: Record<string, { lat: number; lng: number; address: string }> = {
-  "Restaurant K2": { lat: 58.9731, lng: 5.7346, address: "Pedersgata 32, Stavanger" },
-  "Sabi Omakase": { lat: 58.9715, lng: 5.7335, address: "Pedersgata 28, Stavanger" },
-  "Bravo": { lat: 58.9720, lng: 5.7340, address: "Pedersgata 30, Stavanger" },
-  "Bellies": { lat: 58.9708, lng: 5.7332, address: "Pedersgata 26, Stavanger" },
-  "An Nam": { lat: 58.9725, lng: 5.7343, address: "Pedersgata 34, Stavanger" },
-  "Kansui": { lat: 58.9712, lng: 5.7338, address: "Pedersgata 29, Stavanger" },
-  "Miyako": { lat: 58.9718, lng: 5.7341, address: "Pedersgata 31, Stavanger" },
-  "Casa Gio": { lat: 58.9722, lng: 5.7345, address: "Pedersgata 33, Stavanger" },
-  "Delicatessen Tapasbar": { lat: 58.9710, lng: 5.7336, address: "Pedersgata 27, Stavanger" },
-  "Meze Restaurant": { lat: 58.9716, lng: 5.7339, address: "Pedersgata 30B, Stavanger" }
-};
-
 const RouteMap = ({ routeId, routeName, stops = [] }: RouteMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [routeStops, setRouteStops] = useState<RouteStop[]>([]);
+
+  useEffect(() => {
+    const fetchRouteStops = async () => {
+      try {
+        // Get route stops with restaurant data
+        const { data: routeStopsData, error: stopsError } = await supabase
+          .from('route_stops')
+          .select(`
+            *,
+            restaurants (
+              id, name, cuisine_type, lat, lng, address
+            )
+          `)
+          .eq('route_id', routeId)
+          .order('order_index');
+
+        if (stopsError) throw stopsError;
+
+        const formattedStops = routeStopsData?.map((stop: any, index: number) => ({
+          id: stop.restaurant_id,
+          name: stop.restaurants.name,
+          cuisine: stop.restaurants.cuisine_type,
+          lat: parseFloat(stop.restaurants.lat),
+          lng: parseFloat(stop.restaurants.lng),
+          address: stop.restaurants.address,
+          order: stop.order_index || index + 1
+        })) || [];
+
+        setRouteStops(formattedStops);
+      } catch (err) {
+        console.error('Error fetching route stops:', err);
+        // Fallback to default Pedersgata restaurants if no route stops found
+        setRouteStops([
+          {
+            id: '1',
+            name: 'Restaurant K2',
+            cuisine: 'Moderne nordisk',
+            lat: 58.9731,
+            lng: 5.7346,
+            address: 'Pedersgata 32, Stavanger',
+            order: 1
+          },
+          {
+            id: '2', 
+            name: 'Sabi Omakase',
+            cuisine: 'Japansk sushi',
+            lat: 58.9715,
+            lng: 5.7335,
+            address: 'Pedersgata 28, Stavanger',
+            order: 2
+          },
+          {
+            id: '3',
+            name: 'Bravo',
+            cuisine: 'Moderne europeisk',
+            lat: 58.9720,
+            lng: 5.7340,
+            address: 'Pedersgata 30, Stavanger',
+            order: 3
+          }
+        ]);
+      }
+    };
+
+    fetchRouteStops();
+  }, [routeId]);
 
   useEffect(() => {
     const initializeMap = async () => {
+      if (routeStops.length === 0) return;
+
       try {
         setIsLoading(true);
         setError(null);
@@ -80,37 +135,6 @@ const RouteMap = ({ routeId, routeName, stops = [] }: RouteMapProps) => {
         });
 
         mapInstanceRef.current = map;
-
-        // Create sample stops if none provided
-        const routeStops: RouteStop[] = stops.length > 0 ? stops : [
-          {
-            id: '1',
-            name: 'Restaurant K2',
-            cuisine: 'Moderne nordisk',
-            lat: stavangerRestaurants["Restaurant K2"].lat,
-            lng: stavangerRestaurants["Restaurant K2"].lng,
-            address: stavangerRestaurants["Restaurant K2"].address,
-            order: 1
-          },
-          {
-            id: '2', 
-            name: 'Sabi Omakase',
-            cuisine: 'Japansk sushi',
-            lat: stavangerRestaurants["Sabi Omakase"].lat,
-            lng: stavangerRestaurants["Sabi Omakase"].lng,
-            address: stavangerRestaurants["Sabi Omakase"].address,
-            order: 2
-          },
-          {
-            id: '3',
-            name: 'Bravo',
-            cuisine: 'Moderne europeisk',
-            lat: stavangerRestaurants["Bravo"].lat,
-            lng: stavangerRestaurants["Bravo"].lng,
-            address: stavangerRestaurants["Bravo"].address,
-            order: 3
-          }
-        ];
 
         // Create markers for each stop
         const markers: google.maps.Marker[] = [];
@@ -152,9 +176,7 @@ const RouteMap = ({ routeId, routeName, stops = [] }: RouteMapProps) => {
           });
 
           marker.addListener('click', () => {
-            // Close all other info windows
             infoWindows.forEach(iw => iw.close());
-            // Open this info window
             infoWindow.open(map, marker);
           });
 
@@ -166,7 +188,7 @@ const RouteMap = ({ routeId, routeName, stops = [] }: RouteMapProps) => {
         if (routeStops.length > 1) {
           const directionsService = new DirectionsService();
           const directionsRenderer = new DirectionsRenderer({
-            suppressMarkers: true, // We're using custom markers
+            suppressMarkers: true,
             polylineOptions: {
               strokeColor: '#059669',
               strokeWeight: 4,
@@ -194,7 +216,6 @@ const RouteMap = ({ routeId, routeName, stops = [] }: RouteMapProps) => {
         }
 
         setIsLoading(false);
-
       } catch (err) {
         console.error('Error initializing map:', err);
         setError(err instanceof Error ? err.message : 'Failed to load map');
@@ -203,7 +224,7 @@ const RouteMap = ({ routeId, routeName, stops = [] }: RouteMapProps) => {
     };
 
     initializeMap();
-  }, [routeId, stops]);
+  }, [routeStops]);
 
   if (isLoading) {
     return (

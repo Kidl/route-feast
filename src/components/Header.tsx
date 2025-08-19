@@ -36,6 +36,11 @@ export const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
+            <Link to="/restaurants">
+              <Button variant="ghost" size="sm">
+                Restauranter
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm">
               Logg inn
             </Button>
@@ -75,6 +80,11 @@ export const Header = () => {
                 Kontakt
               </a>
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                <Link to="/restaurants">
+                  <Button variant="ghost" size="sm" className="justify-start">
+                    Restauranter
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm" className="justify-start">
                   Logg inn
                 </Button>

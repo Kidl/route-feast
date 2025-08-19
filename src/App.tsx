@@ -1,52 +1,55 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/toaster";
+import { Sonner } from "@/components/ui/sonner";
 import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Admin from "./pages/Admin";
 import RouteDetail from "./pages/RouteDetail";
+import RestaurantPage from "./pages/RestaurantPage";
+import MenuPage from "./pages/MenuPage";
+import RestaurantsPage from "./pages/RestaurantsPage";
+import AdminRestaurants from "./pages/admin/AdminRestaurants";
+import AdminRoutes from "./pages/admin/AdminRoutes";
+import AdminMenus from "./pages/admin/AdminMenus";
+import AdminBookings from "./pages/admin/AdminBookings";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminNotifications from "./pages/admin/AdminNotifications";
+import AdminExport from "./pages/admin/AdminExport";
 import NotFound from "./pages/NotFound";
-import { Login } from "./pages/Login";
-import { Admin } from "./pages/Admin";
-import { RestaurantPage } from "./pages/RestaurantPage";
-import { MenuPage } from "./pages/MenuPage";
-import { AdminRoutes } from "./pages/admin/AdminRoutes";
-import { AdminRestaurants } from "./pages/admin/AdminRestaurants";
-import { AdminMenus } from "./pages/admin/AdminMenus";
-import { AdminBookings } from "./pages/admin/AdminBookings";
-import { AdminNotifications } from "./pages/admin/AdminNotifications";
-import { AdminExport } from "./pages/admin/AdminExport";
-import { AdminSettings } from "./pages/admin/AdminSettings";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/route/:routeId" element={<RouteDetail />} />
-          <Route path="/restaurants/:slug" element={<RestaurantPage />} />
-          <Route path="/restaurants/:slug/menu" element={<MenuPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-          <Route path="/admin/restaurants" element={<ProtectedRoute><AdminRestaurants /></ProtectedRoute>} />
-          <Route path="/admin/menus" element={<ProtectedRoute><AdminMenus /></ProtectedRoute>} />
-          <Route path="/admin/routes" element={<ProtectedRoute><AdminRoutes /></ProtectedRoute>} />
-          <Route path="/admin/bookings" element={<ProtectedRoute><AdminBookings /></ProtectedRoute>} />
-          <Route path="/admin/notifications" element={<ProtectedRoute><AdminNotifications /></ProtectedRoute>} />
-          <Route path="/admin/export" element={<ProtectedRoute><AdminExport /></ProtectedRoute>} />
-          <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const router = createBrowserRouter([
+  { path: "/", element: <Index /> },
+  { path: "/route/:routeId", element: <RouteDetail /> },
+  { path: "/restaurants", element: <RestaurantsPage /> },
+  { path: "/restaurant/:restaurantId", element: <RestaurantPage /> },
+  { path: "/restaurant/:restaurantId/menu", element: <MenuPage /> },
+  { path: "/login", element: <Login /> },
+  { path: "/admin", element: <ProtectedRoute><Admin /></ProtectedRoute> },
+  { path: "/admin/restaurants", element: <ProtectedRoute><AdminRestaurants /></ProtectedRoute> },
+  { path: "/admin/routes", element: <ProtectedRoute><AdminRoutes /></ProtectedRoute> },
+  { path: "/admin/menus", element: <ProtectedRoute><AdminMenus /></ProtectedRoute> },
+  { path: "/admin/bookings", element: <ProtectedRoute><AdminBookings /></ProtectedRoute> },
+  { path: "/admin/settings", element: <ProtectedRoute><AdminSettings /></ProtectedRoute> },
+  { path: "/admin/notifications", element: <ProtectedRoute><AdminNotifications /></ProtectedRoute> },
+  { path: "/admin/export", element: <ProtectedRoute><AdminExport /></ProtectedRoute> },
+  { path: "*", element: <NotFound /> },
+]);
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <RouterProvider router={router} />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
