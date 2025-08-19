@@ -22,12 +22,13 @@ import { X } from "lucide-react";
 import { RouteBuilder } from "./RouteBuilder";
 
 interface RouteStop {
+  id?: string;
   restaurant_id: string;
-  dish_id: string;
+  dish_ids: string[];
   order_index: number;
   time_override_min?: number;
   restaurant?: any;
-  dish?: any;
+  dishes?: any[];
 }
 
 const routeSchema = z.object({
@@ -124,7 +125,28 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
         .order("order_index");
 
       if (error) throw error;
-      setRouteStops(data || []);
+      
+      // Group by restaurant and order_index, collect dishes
+      const groupedStops = data?.reduce((acc, stop) => {
+        const key = `${stop.restaurant_id}-${stop.order_index}`;
+        if (!acc[key]) {
+          acc[key] = {
+            restaurant_id: stop.restaurant_id,
+            dish_ids: [],
+            order_index: stop.order_index,
+            time_override_min: stop.time_override_min,
+            restaurant: stop.restaurants,
+            dishes: []
+          };
+        }
+        if (stop.dishes) {
+          acc[key].dish_ids.push(stop.dishes.id);
+          acc[key].dishes.push(stop.dishes);
+        }
+        return acc;
+      }, {} as Record<string, RouteStop>) || {};
+      
+      setRouteStops(Object.values(groupedStops));
     } catch (error) {
       console.error("Error loading route stops:", error);
     }
@@ -194,14 +216,16 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
             .eq("route_id", route.id);
         }
 
-        // Insert new stops
-        const stopsData = routeStops.map(stop => ({
-          route_id: savedRoute.id,
-          restaurant_id: stop.restaurant_id,
-          dish_id: stop.dish_id,
-          order_index: stop.order_index,
-          time_override_min: stop.time_override_min,
-        }));
+        // Insert new stops - flatten dish_ids to individual entries
+        const stopsData = routeStops.flatMap(stop => 
+          stop.dish_ids.map(dishId => ({
+            route_id: savedRoute.id,
+            restaurant_id: stop.restaurant_id,
+            dish_id: dishId,
+            order_index: stop.order_index,
+            time_override_min: stop.time_override_min,
+          }))
+        );
 
         const { error: stopsError } = await supabase
           .from("route_stops")
