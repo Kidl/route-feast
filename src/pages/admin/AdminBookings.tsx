@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { format, startOfDay, isSameDay, getWeek, startOfWeek, endOfWeek, eachDayOfInterval } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Calendar as CalendarIcon, Plus, Filter, Search, Users, Clock, MapPin, Phone, Mail, ChevronDown, ChevronUp, UtensilsCrossed, Calendar as CalendarDayIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Filter, Search, Users, Clock, MapPin, Phone, Mail, ChevronDown, ChevronUp, UtensilsCrossed, Calendar as CalendarDayIcon, Building } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -31,18 +31,32 @@ interface Booking {
   special_requests?: string;
   allergies?: string;
   dietary_preferences: string[];
+  booking_type: string;
   created_at: string;
-  route: {
+  route?: {
     name: string;
     location: string;
   };
-  schedule: {
+  schedule?: {
     available_date: string;
     start_time: string;
   };
   table?: {
     table_number: string;
     capacity: number;
+  };
+  restaurant_bookings?: RestaurantBooking[];
+}
+
+interface RestaurantBooking {
+  id: string;
+  restaurant_id: string;
+  stop_number: number;
+  estimated_arrival_time: string;
+  estimated_departure_time: string;
+  status: string;
+  restaurant: {
+    name: string;
   };
 }
 
@@ -77,10 +91,12 @@ export function AdminBookings() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [restaurantFilter, setRestaurantFilter] = useState<string>("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showTableDialog, setShowTableDialog] = useState(false);
   const [collapsedDates, setCollapsedDates] = useState<Set<string>>(new Set());
+  const [restaurants, setRestaurants] = useState<{ id: string; name: string }[]>([]);
 
   const form = useForm({
     defaultValues: {
@@ -97,6 +113,7 @@ export function AdminBookings() {
   useEffect(() => {
     fetchBookings();
     fetchTables();
+    fetchRestaurants();
   }, [selectedDate]);
 
   const fetchBookings = async () => {
@@ -110,7 +127,16 @@ export function AdminBookings() {
           *,
           route:routes(name, location),
           schedule:route_schedules(available_date, start_time),
-          table:restaurant_tables(table_number, capacity)
+          table:restaurant_tables(table_number, capacity),
+          restaurant_bookings(
+            id,
+            restaurant_id,
+            stop_number,
+            estimated_arrival_time,
+            estimated_departure_time,
+            status,
+            restaurant:restaurants(name)
+          )
         `)
         .gte('created_at', format(weekStart, 'yyyy-MM-dd'))
         .lte('created_at', format(weekEnd, 'yyyy-MM-dd'))
@@ -142,6 +168,21 @@ export function AdminBookings() {
       setTables(data || []);
     } catch (error) {
       console.error('Error fetching tables:', error);
+    }
+  };
+
+  const fetchRestaurants = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('restaurants')
+        .select('id, name')
+        .eq('status', 'active')
+        .order('name');
+
+      if (error) throw error;
+      setRestaurants(data || []);
+    } catch (error) {
+      console.error('Error fetching restaurants:', error);
     }
   };
 
@@ -246,7 +287,11 @@ export function AdminBookings() {
     
     const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
     
-    return matchesSearch && matchesStatus;
+    const matchesRestaurant = restaurantFilter === "all" || 
+      (booking.restaurant_bookings && booking.restaurant_bookings.some(rb => rb.restaurant_id === restaurantFilter)) ||
+      (booking.booking_type === 'table'); // Show table bookings when "all" is selected
+    
+    return matchesSearch && matchesStatus && matchesRestaurant;
   });
 
   const getBookingsByDate = () => {
@@ -264,7 +309,7 @@ export function AdminBookings() {
   };
 
   const getBookingType = (booking: Booking) => {
-    if (booking.route) {
+    if (booking.booking_type === 'route') {
       return 'Gastro Route';
     } else if (booking.schedule) {
       return 'Bordreservasjon med forhåndsbestilling';
@@ -297,6 +342,23 @@ export function AdminBookings() {
             {getBookingType(booking) === 'Bordreservasjon med forhåndsbestilling' && <CalendarDayIcon className="w-3 h-3 mr-1" />}
             {getBookingType(booking)}
           </Badge>
+          
+          {/* Show restaurant stops for route bookings */}
+          {booking.restaurant_bookings && booking.restaurant_bookings.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-1">
+              {booking.restaurant_bookings.slice(0, 2).map((rb) => (
+                <Badge key={rb.id} variant="outline" className="text-xs">
+                  <Building className="w-3 h-3 mr-1" />
+                  Stopp {rb.stop_number}: {rb.restaurant.name}
+                </Badge>
+              ))}
+              {booking.restaurant_bookings.length > 2 && (
+                <Badge variant="outline" className="text-xs">
+                  +{booking.restaurant_bookings.length - 2} flere
+                </Badge>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -520,6 +582,20 @@ export function AdminBookings() {
                   {statusColumns.map(status => (
                     <SelectItem key={status.key} value={status.key}>
                       {status.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={restaurantFilter} onValueChange={setRestaurantFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Restaurant" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle restauranter</SelectItem>
+                  {restaurants.map(restaurant => (
+                    <SelectItem key={restaurant.id} value={restaurant.id}>
+                      {restaurant.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

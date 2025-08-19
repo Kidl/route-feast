@@ -4,14 +4,17 @@ import { Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addDays, startOfToday, isSameDay } from "date-fns";
 import { nb } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
+import { RouteAvailabilityService } from "@/services/RouteAvailabilityService";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 interface TimeSlot {
   id: string;
   start_time: string;
-  available_spots: number;
+  end_time: string;
+  max_capacity: number;
   available_date: string;
+  price_override_nok?: number;
 }
 
 interface DateTimePickerProps {
@@ -32,23 +35,21 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
   const today = startOfToday();
   const visibleDates = Array.from({ length: 7 }, (_, i) => addDays(today, i + dateOffset));
 
-  // Fetch all available dates for this route
+  // Fetch all available dates for this route using new availability system
   useEffect(() => {
     const fetchAvailableDates = async () => {
       try {
-        const { data, error } = await supabase
-          .from('route_schedules')
-          .select('available_date')
-          .eq('route_id', routeId)
-          .eq('is_active', true)
-          .gt('available_spots', 0)
-          .gte('available_date', format(today, 'yyyy-MM-dd'))
-          .order('available_date');
+        const endDate = format(addDays(today, 60), 'yyyy-MM-dd'); // 60 days ahead
+        const result = await RouteAvailabilityService.getRouteAvailability(
+          routeId,
+          format(today, 'yyyy-MM-dd'),
+          endDate
+        );
 
-        if (error) throw error;
-        
-        const dates = [...new Set(data?.map(slot => new Date(slot.available_date)) || [])];
-        setAvailableDates(dates);
+        if (result.success && result.data) {
+          const dates = [...new Set(result.data.map(slot => new Date(slot.available_date)))];
+          setAvailableDates(dates);
+        }
       } catch (error) {
         console.error('Error fetching available dates:', error);
       }
@@ -62,18 +63,17 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
     try {
       const formattedDate = format(date, 'yyyy-MM-dd');
       
-      const { data, error } = await supabase
-        .from('route_schedules')
-        .select('id, start_time, available_spots, available_date')
-        .eq('route_id', routeId)
-        .eq('available_date', formattedDate)
-        .eq('is_active', true)
-        .gt('available_spots', 0)
-        .order('start_time');
+      const result = await RouteAvailabilityService.getRouteAvailability(
+        routeId,
+        formattedDate,
+        formattedDate
+      );
 
-      if (error) throw error;
-      
-      setAvailableSlots(data || []);
+      if (result.success && result.data) {
+        setAvailableSlots(result.data);
+      } else {
+        setAvailableSlots([]);
+      }
     } catch (error) {
       console.error('Error fetching time slots:', error);
       toast({
@@ -186,7 +186,7 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
             <div className="space-y-3">
               {availableSlots.map((slot) => {
                 const isSelected = selectedTimeSlot?.id === slot.id;
-                const isLowAvailability = slot.available_spots <= 3;
+                const isLowCapacity = slot.max_capacity <= 5;
                 
                 return (
                   <button
@@ -211,12 +211,20 @@ export const DateTimePicker = ({ routeId, maxCapacity, onSelectionChange }: Date
                           "text-sm",
                           isSelected ? "text-white/80" : "text-gray-600"
                         )}>
-                          {slot.available_spots} igjen
+                          {slot.max_capacity} plasser
                         </span>
-                        {isLowAvailability && (
+                        {slot.price_override_nok && (
+                          <span className={cn(
+                            "text-sm font-medium",
+                            isSelected ? "text-white" : "text-primary"
+                          )}>
+                            {slot.price_override_nok / 100} kr
+                          </span>
+                        )}
+                        {isLowCapacity && (
                           <div className={cn(
                             "w-2 h-2 rounded-full",
-                            isSelected ? "bg-white" : "bg-red-500"
+                            isSelected ? "bg-white" : "bg-orange-500"
                           )}></div>
                         )}
                       </div>

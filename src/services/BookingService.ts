@@ -1,8 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
+import { RouteAvailabilityService } from "./RouteAvailabilityService";
+import { addMinutes, format } from "date-fns";
 
 export interface BookingData {
   routeId: string;
-  scheduleId: string;
+  scheduleId?: string;
   userType: 'guest' | 'registered';
   userData: {
     name?: string;
@@ -25,12 +27,28 @@ export interface BookingData {
 }
 
 export class BookingService {
-  static async createBooking(bookingData: BookingData) {
+  static async createBooking(bookingData: BookingData, startDateTime: Date) {
     try {
+      // Check restaurant availability first
+      const availabilityCheck = await RouteAvailabilityService.checkRestaurantAvailability(
+        bookingData.routeId,
+        startDateTime,
+        bookingData.participantInfo.numberOfPeople
+      );
+
+      if (!availabilityCheck.success) {
+        throw new Error('Failed to check restaurant availability');
+      }
+
+      const unavailableRestaurants = availabilityCheck.data?.filter(r => !r.is_available);
+      if (unavailableRestaurants && unavailableRestaurants.length > 0) {
+        throw new Error(`Some restaurants are not available: ${unavailableRestaurants.map(r => r.restaurant_name).join(', ')}`);
+      }
+
       // Create the main booking record
       const bookingInsert = {
         route_id: bookingData.routeId,
-        schedule_id: bookingData.scheduleId,
+        schedule_id: bookingData.scheduleId || null,
         user_id: bookingData.userData.user_id || null,
         guest_email: bookingData.userType === 'guest' ? bookingData.userData.email : null,
         guest_phone: bookingData.userType === 'guest' ? bookingData.userData.phone : null,
@@ -42,7 +60,8 @@ export class BookingService {
         special_requests: bookingData.participantInfo.specialRequests || null,
         status: 'confirmed',
         payment_status: bookingData.paymentData.status === 'succeeded' ? 'paid' : 'pending',
-        stripe_payment_intent_id: bookingData.paymentData.paymentId
+        stripe_payment_intent_id: bookingData.paymentData.paymentId,
+        booking_type: 'route'
       };
 
       const { data: booking, error: bookingError } = await supabase
@@ -52,6 +71,31 @@ export class BookingService {
         .single();
 
       if (bookingError) throw bookingError;
+
+      // Create individual restaurant bookings for each stop
+      if (availabilityCheck.data) {
+        const restaurantBookings = availabilityCheck.data.map((restaurant, index) => ({
+          booking_id: booking.id,
+          restaurant_id: restaurant.restaurant_id,
+          stop_number: index + 1,
+          estimated_arrival_time: restaurant.estimated_arrival.toISOString(),
+          estimated_departure_time: restaurant.estimated_departure.toISOString(),
+          number_of_people: bookingData.participantInfo.numberOfPeople,
+          status: 'pending',
+          allergies: bookingData.participantInfo.allergies || null,
+          dietary_preferences: bookingData.participantInfo.dietaryPreferences || [],
+          special_requests: bookingData.participantInfo.specialRequests || null
+        }));
+
+        const { error: restaurantBookingsError } = await supabase
+          .from('restaurant_bookings')
+          .insert(restaurantBookings);
+
+        if (restaurantBookingsError) {
+          console.error('Error creating restaurant bookings:', restaurantBookingsError);
+          // Don't fail the main booking, but log the error
+        }
+      }
 
       // Update route schedule availability - simple approach for now
       // In production, this should be done with a database transaction

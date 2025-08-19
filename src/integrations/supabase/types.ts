@@ -115,6 +115,7 @@ export type Database = {
         Row: {
           allergies: string | null
           booking_reference: string
+          booking_type: string | null
           cancellation_reason: string | null
           cancelled_at: string | null
           confirmation_sent_at: string | null
@@ -140,6 +141,7 @@ export type Database = {
         Insert: {
           allergies?: string | null
           booking_reference?: string
+          booking_type?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           confirmation_sent_at?: string | null
@@ -165,6 +167,7 @@ export type Database = {
         Update: {
           allergies?: string | null
           booking_reference?: string
+          booking_type?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           confirmation_sent_at?: string | null
@@ -465,6 +468,89 @@ export type Database = {
         }
         Relationships: []
       }
+      restaurant_bookings: {
+        Row: {
+          allergies: string | null
+          booking_id: string
+          created_at: string
+          dietary_preferences: string[] | null
+          estimated_arrival_time: string
+          estimated_departure_time: string
+          id: string
+          number_of_people: number
+          restaurant_id: string
+          route_stop_id: string | null
+          special_requests: string | null
+          status: string
+          stop_number: number
+          table_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          allergies?: string | null
+          booking_id: string
+          created_at?: string
+          dietary_preferences?: string[] | null
+          estimated_arrival_time: string
+          estimated_departure_time: string
+          id?: string
+          number_of_people: number
+          restaurant_id: string
+          route_stop_id?: string | null
+          special_requests?: string | null
+          status?: string
+          stop_number: number
+          table_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allergies?: string | null
+          booking_id?: string
+          created_at?: string
+          dietary_preferences?: string[] | null
+          estimated_arrival_time?: string
+          estimated_departure_time?: string
+          id?: string
+          number_of_people?: number
+          restaurant_id?: string
+          route_stop_id?: string | null
+          special_requests?: string | null
+          status?: string
+          stop_number?: number
+          table_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_bookings_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restaurant_bookings_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restaurant_bookings_route_stop_id_fkey"
+            columns: ["route_stop_id"]
+            isOneToOne: false
+            referencedRelation: "route_stops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restaurant_bookings_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "restaurant_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       restaurant_images: {
         Row: {
           alt_text: string | null
@@ -493,6 +579,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "restaurant_images_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurant_operating_hours: {
+        Row: {
+          close_time: string
+          created_at: string
+          day_of_week: number
+          id: string
+          is_closed: boolean | null
+          open_time: string
+          restaurant_id: string
+          updated_at: string
+        }
+        Insert: {
+          close_time: string
+          created_at?: string
+          day_of_week: number
+          id?: string
+          is_closed?: boolean | null
+          open_time: string
+          restaurant_id: string
+          updated_at?: string
+        }
+        Update: {
+          close_time?: string
+          created_at?: string
+          day_of_week?: number
+          id?: string
+          is_closed?: boolean | null
+          open_time?: string
+          restaurant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_operating_hours_restaurant_id_fkey"
             columns: ["restaurant_id"]
             isOneToOne: false
             referencedRelation: "restaurants"
@@ -596,6 +723,53 @@ export type Database = {
         }
         Relationships: []
       }
+      route_availability: {
+        Row: {
+          available_date: string
+          created_at: string
+          end_time: string
+          id: string
+          is_available: boolean
+          max_capacity: number
+          price_override_nok: number | null
+          route_id: string
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          available_date: string
+          created_at?: string
+          end_time: string
+          id?: string
+          is_available?: boolean
+          max_capacity?: number
+          price_override_nok?: number | null
+          route_id: string
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          available_date?: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          is_available?: boolean
+          max_capacity?: number
+          price_override_nok?: number | null
+          route_id?: string
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "route_availability_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       route_schedules: {
         Row: {
           available_date: string
@@ -645,6 +819,7 @@ export type Database = {
           route_id: string
           time_override_min: number | null
           title: string | null
+          walking_time_to_next_min: number | null
         }
         Insert: {
           created_at?: string
@@ -656,6 +831,7 @@ export type Database = {
           route_id: string
           time_override_min?: number | null
           title?: string | null
+          walking_time_to_next_min?: number | null
         }
         Update: {
           created_at?: string
@@ -667,6 +843,7 @@ export type Database = {
           route_id?: string
           time_override_min?: number | null
           title?: string | null
+          walking_time_to_next_min?: number | null
         }
         Relationships: [
           {
