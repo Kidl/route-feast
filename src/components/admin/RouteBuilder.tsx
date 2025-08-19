@@ -60,6 +60,7 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
   }, []);
 
   const loadRestaurants = async () => {
+    console.log("🔄 Loading restaurants...");
     try {
       const { data, error } = await supabase
         .from("restaurants")
@@ -68,9 +69,10 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
         .order("name");
 
       if (error) throw error;
+      console.log("✅ Loaded restaurants:", data?.length || 0);
       setRestaurants(data || []);
     } catch (error) {
-      console.error("Error loading restaurants:", error);
+      console.error("❌ Error loading restaurants:", error);
       toast({
         title: "Feil",
         description: "Kunne ikke laste restauranter.",
@@ -80,6 +82,7 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
   };
 
   const loadRestaurantDishes = async (restaurantId: string) => {
+    console.log("🍽️ Loading dishes for restaurant:", restaurantId);
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -93,9 +96,11 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
         .order("name");
 
       if (error) throw error;
+      console.log("✅ Loaded dishes:", data?.length || 0, "for restaurant:", restaurantId);
+      console.log("📋 Dishes data:", data);
       setRestaurantDishes(data || []);
     } catch (error) {
-      console.error("Error loading dishes:", error);
+      console.error("❌ Error loading dishes:", error);
       toast({
         title: "Feil",
         description: "Kunne ikke laste retter.",
@@ -107,6 +112,7 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
   };
 
   const handleAddRestaurant = (restaurant: Restaurant) => {
+    console.log("🏪 Selected restaurant:", restaurant.name);
     setSelectedRestaurant(restaurant);
     loadRestaurantDishes(restaurant.id);
     setShowRestaurantDialog(false);
@@ -114,6 +120,7 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
   };
 
   const handleAddDish = (dish: Dish) => {
+    console.log("🍴 Selected dish:", dish.name, "from restaurant:", selectedRestaurant?.name);
     if (!selectedRestaurant) return;
 
     const newStop: RouteStop = {
@@ -125,6 +132,7 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
       dish: dish,
     };
 
+    console.log("➕ Adding new route stop:", newStop);
     onChange([...value, newStop]);
     setShowDishDialog(false);
     setSelectedRestaurant(null);

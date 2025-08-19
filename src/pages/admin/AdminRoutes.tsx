@@ -126,6 +126,7 @@ export function AdminRoutes() {
   };
 
   const handleCreateNew = () => {
+    console.log("➕ Creating new route...");
     setEditingRoute(null);
     setDrawerOpen(true);
   };
@@ -293,9 +294,15 @@ export function AdminRoutes() {
 
         <RouteFormDrawer
           open={drawerOpen}
-          onOpenChange={setDrawerOpen}
+          onOpenChange={(open) => {
+            console.log("🚪 RouteFormDrawer open state changed:", open);
+            setDrawerOpen(open);
+          }}
           route={editingRoute}
-          onSave={loadRoutes}
+          onSave={() => {
+            console.log("💾 Route saved, reloading routes...");
+            loadRoutes();
+          }}
         />
       </div>
     </AdminLayout>
