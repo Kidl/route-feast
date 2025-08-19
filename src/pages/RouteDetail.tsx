@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BookingDialog } from "@/components/booking/BookingDialog";
 import { Restaurant } from "@/data/mockRoutes";
 import { useToast } from "@/hooks/use-toast";
+import RouteMap from "@/components/restaurant/RouteMap";
 
 interface DetailedRoute {
   id: string;
@@ -142,6 +143,12 @@ const RouteDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Route Map */}
+            <RouteMap 
+              routeId={route.id}
+              routeName={route.name}
+            />
+
             {/* Highlights */}
             {route.highlights.length > 0 && (
               <Card>
