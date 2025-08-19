@@ -229,16 +229,16 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader>
+      <DrawerContent className="max-h-[95vh] flex flex-col">
+        <DrawerHeader className="flex-shrink-0">
           <DrawerTitle>{route ? "Rediger rute" : "Ny rute"}</DrawerTitle>
           <DrawerDescription>
-            {route ? "Oppdater ruteinformasjon" : "Opprett en ny kulinarisk rute"}
+            {route ? "Oppdater ruteinformasjon og rutestopp" : "Opprett en ny kulinarisk rute med restauranter og meny"}
           </DrawerDescription>
         </DrawerHeader>
         
-        <div className="px-4 pb-4 overflow-y-auto">
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="flex-1 px-4 pb-4 overflow-y-auto">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Navn *</Label>
@@ -332,16 +332,17 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
 
             <Separator className="my-6" />
 
-            {/* ROUTE BUILDER SECTION - CRITICAL */}
-            <div className="space-y-4 border-2 border-primary/20 rounded-lg p-6 bg-primary/5">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-primary rounded-full"></div>
-                <Label className="text-lg font-bold text-primary">RUTESTOPP - RESTAURANT & MENY</Label>
+            {/* ROUTE BUILDER SECTION - MOST IMPORTANT */}
+            <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/30 rounded-lg p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 bg-primary rounded-full animate-pulse"></div>
+                <h3 className="text-xl font-bold text-primary">🏪 RUTESTOPP - RESTAURANT & MENY</h3>
               </div>
-              <p className="text-sm text-muted-foreground font-medium">
-                🏪 Velg restauranter og retter for ruten. Rekkefølgen definerer rutens gang.
+              <p className="text-sm font-medium text-foreground">
+                Dette er hovedfunksjonen! Velg restauranter og retter som utgjør ruten din.
+                Klikk på "Legg til stopp" for å begynne å bygge ruten.
               </p>
-              <div className="min-h-[200px] bg-background rounded-lg border border-border p-4">
+              <div className="min-h-[300px] bg-background rounded-lg border-2 border-dashed border-primary/30 p-6">
                 <RouteBuilder 
                   value={routeStops} 
                   onChange={(stops) => {
@@ -349,6 +350,10 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
                     setRouteStops(stops);
                   }} 
                 />
+              </div>
+              <div className="text-xs text-muted-foreground bg-blue-50 p-3 rounded border-l-4 border-blue-400">
+                💡 Tips: Hver rute bør ha minst 2-3 stopp for en komplett opplevelse. 
+                Du kan justere tiden på hvert stopp for å tilpasse varigheten.
               </div>
             </div>
 
