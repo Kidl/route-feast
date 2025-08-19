@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Menu, X, Settings } from "lucide-react";
+import { Menu, X, Settings } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import pederLogo from "@/assets/peder-logo.png";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,15 +13,13 @@ export const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-hero rounded-md flex items-center justify-center">
-              <MapPin className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="text-xl font-bold font-heading text-primary">GastroRoute</span>
-              <Badge variant="secondary" className="ml-2 text-xs">Beta</Badge>
-            </div>
-          </div>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={pederLogo} 
+              alt="Peder Logo" 
+              className="h-10 w-auto object-contain"
+            />
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
