@@ -193,4 +193,4 @@ const RestaurantsPage = () => {
   );
 };
 
-export default RestaurantsPage;
+export { RestaurantsPage as default };
