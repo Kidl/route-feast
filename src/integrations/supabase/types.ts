@@ -637,30 +637,36 @@ export type Database = {
       route_stops: {
         Row: {
           created_at: string
+          description: string | null
           dish_id: string
           id: string
           order_index: number
           restaurant_id: string
           route_id: string
           time_override_min: number | null
+          title: string | null
         }
         Insert: {
           created_at?: string
+          description?: string | null
           dish_id: string
           id?: string
           order_index: number
           restaurant_id: string
           route_id: string
           time_override_min?: number | null
+          title?: string | null
         }
         Update: {
           created_at?: string
+          description?: string | null
           dish_id?: string
           id?: string
           order_index?: number
           restaurant_id?: string
           route_id?: string
           time_override_min?: number | null
+          title?: string | null
         }
         Relationships: [
           {

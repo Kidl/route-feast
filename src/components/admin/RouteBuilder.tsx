@@ -35,6 +35,8 @@ interface RouteStop {
   dish_ids: string[]; // Changed to array for multiple dishes
   order_index: number;
   time_override_min?: number;
+  title?: string;
+  description?: string;
   restaurant?: Restaurant;
   dishes?: Dish[]; // Changed to array
 }
@@ -50,6 +52,8 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [restaurantDishes, setRestaurantDishes] = useState<Dish[]>([]);
   const [selectedDishes, setSelectedDishes] = useState<string[]>([]);
+  const [stopTitle, setStopTitle] = useState("");
+  const [stopDescription, setStopDescription] = useState("");
   const [showStopDialog, setShowStopDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState<'restaurant' | 'dishes'>('restaurant');
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -176,6 +180,8 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
         ...newStops[editingStopIndex],
         restaurant_id: selectedRestaurant.id,
         dish_ids: selectedDishes,
+        title: stopTitle || `Stopp ${editingStopIndex + 1}`,
+        description: stopDescription,
         restaurant: selectedRestaurant,
         dishes: selectedDishObjects,
       };
@@ -187,6 +193,8 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
         dish_ids: selectedDishes,
         order_index: value.length,
         time_override_min: 30,
+        title: stopTitle || `Stopp ${value.length + 1}`,
+        description: stopDescription,
         restaurant: selectedRestaurant,
         dishes: selectedDishObjects,
       };
@@ -201,6 +209,8 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
     setCurrentStep('restaurant');
     setSelectedRestaurant(null);
     setSelectedDishes([]);
+    setStopTitle("");
+    setStopDescription("");
     setRestaurantDishes([]);
     setEditingStopIndex(-1);
   };
@@ -215,6 +225,8 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
     if (stop.restaurant) {
       setSelectedRestaurant(stop.restaurant);
       setSelectedDishes(stop.dish_ids || []);
+      setStopTitle(stop.title || "");
+      setStopDescription(stop.description || "");
       loadRestaurantDishes(stop.restaurant.id);
       setEditingStopIndex(index);
       setCurrentStep('dishes');
@@ -287,7 +299,9 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
                     <Badge variant="outline" className="text-xs">
                       Stopp {index + 1}
                     </Badge>
-                    <span className="font-medium text-lg">{stop.restaurant?.name}</span>
+                    <span className="font-medium text-lg">
+                      {stop.title || `Stopp ${index + 1}`}
+                    </span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -298,13 +312,21 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
                     </Button>
                   </div>
                   
-                  <div className="text-sm text-muted-foreground">
-                    <MapPin className="h-3 w-3 inline mr-1" />
-                    {stop.restaurant?.address}
-                    {stop.restaurant?.cuisine_type && (
-                      <Badge variant="secondary" className="ml-2 text-xs">
-                        {stop.restaurant.cuisine_type}
-                      </Badge>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">{stop.restaurant?.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      <MapPin className="h-3 w-3 inline mr-1" />
+                      {stop.restaurant?.address}
+                      {stop.restaurant?.cuisine_type && (
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          {stop.restaurant.cuisine_type}
+                        </Badge>
+                      )}
+                    </div>
+                    {stop.description && (
+                      <div className="text-sm text-muted-foreground italic">
+                        {stop.description}
+                      </div>
                     )}
                   </div>
 
@@ -447,15 +469,39 @@ export function RouteBuilder({ value, onChange }: RouteBuilderProps) {
                 </Button>
               </div>
 
-              <div className="mb-4">
-                <div className="text-sm font-medium mb-2">
-                  Velg retter ({selectedDishes.length} valgt - minst 1 påkrevd)
+              <div className="mb-4 space-y-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="stop-title" className="text-sm font-medium">
+                    Stopp-tittel (valgfri)
+                  </Label>
+                  <Input
+                    id="stop-title"
+                    placeholder={`Stopp ${editingStopIndex >= 0 ? editingStopIndex + 1 : value.length + 1}`}
+                    value={stopTitle}
+                    onChange={(e) => setStopTitle(e.target.value)}
+                  />
                 </div>
-                {selectedDishes.length === 0 && (
-                  <div className="text-xs text-muted-foreground bg-yellow-50 p-2 rounded border border-yellow-200">
-                    ⚠️ Du må velge minst én rett for å kunne lagre stoppet
+                <div className="grid gap-2">
+                  <Label htmlFor="stop-description" className="text-sm font-medium">
+                    Beskrivelse (valgfri)
+                  </Label>
+                  <Input
+                    id="stop-description"
+                    placeholder="Beskrivelse av stoppet..."
+                    value={stopDescription}
+                    onChange={(e) => setStopDescription(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <div className="text-sm font-medium mb-2">
+                    Velg retter ({selectedDishes.length} valgt - minst 1 påkrevd)
                   </div>
-                )}
+                  {selectedDishes.length === 0 && (
+                    <div className="text-xs text-muted-foreground bg-yellow-50 p-2 rounded border border-yellow-200">
+                      ⚠️ Du må velge minst én rett for å kunne lagre stoppet
+                    </div>
+                  )}
+                </div>
               </div>
 
               <ScrollArea className="h-80">
