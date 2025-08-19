@@ -96,20 +96,29 @@ export const RouteCard = ({
           </h3>
         </Link>
 
-        {/* Duration and Spots */}
+        {/* Duration and Spots with meal count */}
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span className="text-sm font-medium">{duration}</span>
           <span>•</span>
           <span>{availableSpots} plasser igjen</span>
+          <span>•</span>
+          <span>{restaurants.length} retter</span>
         </div>
 
-        {/* Restaurants */}
+        {/* Restaurants - clickable for info */}
         <div className="text-sm text-gray-600">
           {restaurants.slice(0, 2).map((r, index) => (
             <span key={index}>
-              <span className="hover:text-primary transition-colors cursor-pointer">
+              <button 
+                className="hover:text-primary transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit underline-offset-2 hover:underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // TODO: Open restaurant info modal
+                }}
+              >
                 {r.name}
-              </span>
+              </button>
               {index < Math.min(restaurants.length, 2) - 1 && ', '}
             </span>
           ))}

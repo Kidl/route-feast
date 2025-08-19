@@ -10,6 +10,31 @@ import { BookingDialog } from "@/components/booking/BookingDialog";
 import { Restaurant } from "@/data/mockRoutes";
 import { useToast } from "@/hooks/use-toast";
 import RouteMap from "@/components/restaurant/RouteMap";
+import { InfoModal } from "@/components/InfoModal";
+
+interface RouteStop {
+  id: string;
+  restaurant_id: string;
+  dish_id: string;
+  order_index: number;
+  time_override_min?: number;
+  restaurants: {
+    id: string;
+    name: string;
+    address: string;
+    cuisine_type?: string;
+    lat?: number;
+    lng?: number;
+  };
+  dishes: {
+    id: string;
+    name: string;
+    description?: string;
+    price?: number;
+    dish_type: string;
+    photo_url?: string;
+  };
+}
 
 interface DetailedRoute {
   id: string;
@@ -22,6 +47,7 @@ interface DetailedRoute {
   location: string;
   highlights: string[];
   restaurants: Restaurant[];
+  route_stops?: RouteStop[];
 }
 
 const RouteDetail = () => {
@@ -30,6 +56,10 @@ const RouteDetail = () => {
   const [route, setRoute] = useState<DetailedRoute | null>(null);
   const [loading, setLoading] = useState(true);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [selectedInfo, setSelectedInfo] = useState<{
+    type: "restaurant" | "dish";
+    data: RouteStop["restaurants"] | RouteStop["dishes"];
+  } | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -37,36 +67,47 @@ const RouteDetail = () => {
       if (!routeId) return;
       
       try {
-        const { data, error } = await supabase
-          .from('routes')
-          .select('*')
-          .eq('id', routeId)
-          .eq('is_active', true)
-          .maybeSingle();
+        // Fetch route with stops
+        const { data: routeData, error: routeError } = await supabase
+          .from("routes")
+          .select(`
+            *,
+            route_stops (
+              *,
+              restaurants (*),
+              dishes (*)
+            )
+          `)
+          .eq("id", routeId)
+          .eq("is_active", true)
+          .single();
 
-        if (error) throw error;
-        
-        if (!data) {
-          toast({
-            title: "Rute ikke funnet",
-            description: "Den forespurte ruten kunne ikke finnes.",
-            variant: "destructive"
-          });
-          navigate('/');
-          return;
-        }
+        if (routeError) throw routeError;
 
-        setRoute({
-          ...data,
-          restaurants: [], // Will be populated from route_stops in the future
-          highlights: data.highlights || []
-        });
+        // Transform data to match interface
+        const transformedRoute: DetailedRoute = {
+          id: routeData.id,
+          name: routeData.name,
+          description: routeData.description,
+          image_url: routeData.image_url || "/placeholder.svg",
+          price_nok: routeData.price_nok,
+          duration_hours: routeData.duration_hours,
+          max_capacity: routeData.max_capacity,
+          location: routeData.location,
+          highlights: routeData.highlights || [],
+          restaurants: [], // Legacy field - kept for backwards compatibility
+          route_stops: (routeData.route_stops || []).sort(
+            (a: any, b: any) => a.order_index - b.order_index
+          ),
+        };
+
+        setRoute(transformedRoute);
       } catch (error) {
-        console.error('Error fetching route:', error);
+        console.error("Error fetching route:", error);
         toast({
           title: "Feil",
-          description: "Kunne ikke laste rutedetaljer.",
-          variant: "destructive"
+          description: "Kunne inte laste rutedetaljer.",
+          variant: "destructive",
         });
         navigate('/');
       } finally {
@@ -148,6 +189,64 @@ const RouteDetail = () => {
               routeId={route.id}
               routeName={route.name}
             />
+
+            {/* Route Itinerary */}
+            {route.route_stops && route.route_stops.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ChefHat className="h-5 w-5" />
+                    Rute-program
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-sm text-muted-foreground mb-4">
+                    Totalt {route.route_stops.length} stopp • {Math.round(route.duration_hours * 60)} minutter
+                  </div>
+                  {route.route_stops.map((stop, index) => (
+                    <div key={stop.id} className="flex items-start gap-4 pb-4 border-b last:border-b-0">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+                          {index + 1}
+                        </div>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <button
+                            className="font-medium hover:text-primary transition-colors underline-offset-2 hover:underline"
+                            onClick={() => setSelectedInfo({ type: "restaurant", data: stop.restaurants })}
+                          >
+                            {stop.restaurants.name}
+                          </button>
+                          {stop.restaurants.cuisine_type && (
+                            <Badge variant="outline" className="text-xs">
+                              {stop.restaurants.cuisine_type}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            className="text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-2 hover:underline"
+                            onClick={() => setSelectedInfo({ type: "dish", data: stop.dishes })}
+                          >
+                            {stop.dishes.name}
+                          </button>
+                          {stop.dishes.dish_type && (
+                            <Badge variant="secondary" className="text-xs">
+                              {stop.dishes.dish_type}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          <span>{stop.time_override_min || 30} minutter</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Highlights */}
             {route.highlights.length > 0 && (
@@ -316,6 +415,13 @@ const RouteDetail = () => {
         }}
         open={bookingOpen}
         onOpenChange={setBookingOpen}
+      />
+      {/* Info Modal */}
+      <InfoModal
+        open={selectedInfo !== null}
+        onOpenChange={(open) => !open && setSelectedInfo(null)}
+        type={selectedInfo?.type || "restaurant"}
+        data={selectedInfo?.data || null}
       />
     </div>
   );

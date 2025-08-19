@@ -18,6 +18,16 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
+import { RouteBuilder } from "./RouteBuilder";
+
+interface RouteStop {
+  restaurant_id: string;
+  dish_id: string;
+  order_index: number;
+  time_override_min?: number;
+  restaurant?: any;
+  dish?: any;
+}
 
 const routeSchema = z.object({
   name: z.string().min(1, "Navn er påkrevd"),
@@ -43,6 +53,7 @@ interface RouteFormDrawerProps {
 export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteFormDrawerProps) {
   const [highlights, setHighlights] = useState<string[]>([]);
   const [newHighlight, setNewHighlight] = useState("");
+  const [routeStops, setRouteStops] = useState<RouteStop[]>([]);
   const { toast } = useToast();
   
   const form = useForm<RouteFormData>({
@@ -60,38 +71,63 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
     },
   });
 
+  // Initialize form when drawer opens or route changes
   useEffect(() => {
-    if (route) {
-      // Convert price from øre to kroner for display
-      const priceInKroner = route.price_nok ? route.price_nok / 100 : 0;
-      
-      form.reset({
-        name: route.name || "",
-        description: route.description || "",
-        location: route.location || "",
-        price_nok: priceInKroner,
-        duration_hours: route.duration_hours || 3,
-        max_capacity: route.max_capacity || 12,
-        image_url: route.image_url || "",
-        is_active: route.is_active ?? true,
-        highlights: route.highlights || [],
-      });
-      setHighlights(route.highlights || []);
-    } else {
-      form.reset({
-        name: "",
-        description: "",
-        location: "Stavanger Sentrum",
-        price_nok: 0,
-        duration_hours: 3,
-        max_capacity: 12,
-        image_url: "/src/assets/route-urban.jpg",
-        is_active: true,
-        highlights: [],
-      });
-      setHighlights([]);
+    if (open) {
+      if (route) {
+        // Editing existing route - convert price from øre to kroner
+        const priceInKroner = route.price_nok ? route.price_nok / 100 : 0;
+        
+        form.reset({
+          name: route.name || "",
+          description: route.description || "",
+          location: route.location || "",
+          price_nok: priceInKroner,
+          duration_hours: route.duration_hours || 3,
+          max_capacity: route.max_capacity || 12,
+          image_url: route.image_url || "",
+          is_active: route.is_active ?? true,
+          highlights: route.highlights || [],
+        });
+        setHighlights(route.highlights || []);
+        loadRouteStops(route.id);
+      } else {
+        // Creating new route
+        form.reset({
+          name: "",
+          description: "",
+          location: "Stavanger Sentrum",
+          price_nok: 0,
+          duration_hours: 3,
+          max_capacity: 12,
+          image_url: "/src/assets/route-urban.jpg",
+          is_active: true,
+          highlights: [],
+        });
+        setHighlights([]);
+        setRouteStops([]);
+      }
     }
-  }, [route, form]);
+  }, [open, route, form]);
+
+  const loadRouteStops = async (routeId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("route_stops")
+        .select(`
+          *,
+          restaurants(*),
+          dishes(*)
+        `)
+        .eq("route_id", routeId)
+        .order("order_index");
+
+      if (error) throw error;
+      setRouteStops(data || []);
+    } catch (error) {
+      console.error("Error loading route stops:", error);
+    }
+  };
 
   const addHighlight = () => {
     if (newHighlight.trim() && !highlights.includes(newHighlight.trim())) {
@@ -110,12 +146,16 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
 
   const onSubmit = async (data: RouteFormData) => {
     try {
+      // Calculate total duration from route stops
+      const totalMinutes = routeStops.reduce((total, stop) => total + (stop.time_override_min || 30), 0);
+      const calculatedDuration = totalMinutes / 60; // Convert to hours
+      
       const routeData = {
         name: data.name,
         description: data.description,
         location: data.location,
         price_nok: Math.round(data.price_nok * 100), // Convert to øre
-        duration_hours: data.duration_hours,
+        duration_hours: calculatedDuration > 0 ? calculatedDuration : data.duration_hours,
         max_capacity: data.max_capacity,
         image_url: data.image_url,
         is_active: data.is_active,
@@ -123,19 +163,51 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
         status: 'active'
       };
 
-      let error;
+      let result;
       if (route) {
-        ({ error } = await supabase
+        result = await supabase
           .from("routes")
           .update(routeData)
-          .eq("id", route.id));
+          .eq("id", route.id)
+          .select()
+          .single();
       } else {
-        ({ error } = await supabase
+        result = await supabase
           .from("routes")
-          .insert([routeData]));
+          .insert([routeData])
+          .select()
+          .single();
       }
 
-      if (error) throw error;
+      if (result.error) throw result.error;
+
+      const savedRoute = result.data;
+
+      // Save route stops
+      if (routeStops.length > 0) {
+        // Delete existing stops if updating
+        if (route) {
+          await supabase
+            .from("route_stops")
+            .delete()
+            .eq("route_id", route.id);
+        }
+
+        // Insert new stops
+        const stopsData = routeStops.map(stop => ({
+          route_id: savedRoute.id,
+          restaurant_id: stop.restaurant_id,
+          dish_id: stop.dish_id,
+          order_index: stop.order_index,
+          time_override_min: stop.time_override_min,
+        }));
+
+        const { error: stopsError } = await supabase
+          .from("route_stops")
+          .insert(stopsData);
+
+        if (stopsError) throw stopsError;
+      }
 
       toast({
         title: "Suksess",
@@ -255,6 +327,14 @@ export function RouteFormDrawer({ open, onOpenChange, route, onSave }: RouteForm
                 {...form.register("image_url")}
                 placeholder="/src/assets/route-urban.jpg"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Rutestopp</Label>
+              <p className="text-xs text-muted-foreground">
+                Velg restauranter og retter for ruten. Rekkefølgen definerer rutens gang.
+              </p>
+              <RouteBuilder value={routeStops} onChange={setRouteStops} />
             </div>
 
             <div className="space-y-2">
