@@ -18,10 +18,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Search, Filter, MoreHorizontal, Edit2, Archive, Image } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Edit2, Archive, Image, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { RouteFormDrawer } from "@/components/admin/RouteFormDrawer";
+import { RouteAvailabilityService } from "@/services/RouteAvailabilityService";
 
 interface RouteData {
   id: string;
@@ -131,6 +132,33 @@ export function AdminRoutes() {
     setDrawerOpen(true);
   };
 
+  const handleSetupAvailability = async () => {
+    try {
+      toast({
+        title: "Setup startet",
+        description: "Setter opp tilgjengelighet for alle ruter...",
+      });
+
+      const result = await RouteAvailabilityService.setupInitialAvailability();
+      
+      if (result.success) {
+        toast({
+          title: "Suksess",
+          description: "Tilgjengelighet er satt opp for alle ruter.",
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error("Error setting up availability:", error);
+      toast({
+        title: "Feil",
+        description: "Kunne ikke sette opp tilgjengelighet.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const formatCurrency = (amount: number) => {
     // Convert from øre to kroner (divide by 100)
     const amountInKroner = amount / 100;
@@ -148,10 +176,16 @@ export function AdminRoutes() {
             <h1 className="text-2xl font-bold tracking-tight">Ruter</h1>
             <p className="text-muted-foreground">Administrer kulinariske ruter</p>
           </div>
-          <Button onClick={handleCreateNew} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Ny rute
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleSetupAvailability} variant="outline" className="gap-2">
+              <Play className="h-4 w-4" />
+              Setup tilgjengelighet
+            </Button>
+            <Button onClick={handleCreateNew} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Ny rute
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
